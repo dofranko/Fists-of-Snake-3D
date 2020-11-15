@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"D:\\MyGit\\FoS\\Fists-of-Snake-3D\\FistsOfSnake\\Source\\FistsOfSnake\\FistsOfSnake.Build.cs",
+		"D:\\MyGit\\FoS\\Fists-of-Snake-3D\\FistsOfSnake\\Source\\FistsOfSnake.Target.cs",
+		"D:\\MyGit\\FoS\\Fists-of-Snake-3D\\FistsOfSnake\\Source\\FistsOfSnakeEditor.Target.cs"
+	],
+	"EngineVersion": "4.25.4"
+}

@@ -1,0 +1,16 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-FistsOfSnake.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\FistsOfSnakeEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\FistsOfSnake.cpp.obj"
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\FistsOfSnakeGameModeBase.cpp.obj"
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\FistsOfSnake.init.gen.cpp.obj"
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\FistsOfSnakeGameModeBase.gen.cpp.obj"
+"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\Default.rc2.res"
+/OUT:"D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\UE4Editor-FistsOfSnake.lib"
+/INCLUDE:IMPLEMENT_MODULE_FistsOfSnake

@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "FistsOfSnake",
+			"Path": "D:\\MyGit\\FoS\\Fists-of-Snake-3D\\FistsOfSnake\\Source\\FistsOfSnake.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "FistsOfSnakeEditor",
+			"Path": "D:\\MyGit\\FoS\\Fists-of-Snake-3D\\FistsOfSnake\\Source\\FistsOfSnakeEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

@@ -1,0 +1,2 @@
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\Definitions.FistsOfSnake.h
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Source\FistsOfSnake\FistsOfSnake.h

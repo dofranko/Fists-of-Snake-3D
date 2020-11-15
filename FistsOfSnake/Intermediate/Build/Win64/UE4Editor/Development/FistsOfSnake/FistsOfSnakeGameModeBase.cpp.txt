@@ -1,0 +1,7 @@
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\Definitions.FistsOfSnake.h
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Source\FistsOfSnake\FistsOfSnakeGameModeBase.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Inc\FistsOfSnake\FistsOfSnakeGameModeBase.generated.h

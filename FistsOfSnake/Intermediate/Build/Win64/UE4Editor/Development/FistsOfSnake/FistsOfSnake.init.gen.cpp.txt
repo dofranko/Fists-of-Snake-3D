@@ -1,0 +1,3 @@
+D:\MyGit\FoS\Fists-of-Snake-3D\FistsOfSnake\Intermediate\Build\Win64\UE4Editor\Development\FistsOfSnake\Definitions.FistsOfSnake.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Source\Runtime\CoreUObject\Public\UObject/GeneratedCppIncludes.h
+D:\Gry\Epic Games\Engine\UE_4.25\Engine\Source\Runtime\CoreUObject\Public\UObject/MetaData.h
