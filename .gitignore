@@ -81,7 +81,7 @@ SourceArt/**/*.png
 SourceArt/**/*.tga
 
 # Binary Files
-FistsOfSnake/Binaries/*
+Binaries/*
 Plugins/*/Binaries/*
 
 # Builds
