@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "FPSProjectile.h"
 #include "Components/CapsuleComponent.h"
+#include "Camera/CameraComponent.h"
 #include "FPSCharacter.generated.h"
 
 UCLASS()
@@ -48,4 +49,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AFPSProjectile> ProjectileClass;
 
+	// Sets jump flag when key is pressed.
+	UFUNCTION()
+	void StartJump();
+
+	// Clears jump flag when key is released.
+	UFUNCTION()
+	void StopJump();
+
+	// FPS camera.
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* FPSCameraComponent;
+
+	// First-person mesh (arms), visible only to the owning player.
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* FPSMesh;
 };
