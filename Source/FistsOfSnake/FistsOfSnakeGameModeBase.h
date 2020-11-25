@@ -13,5 +13,6 @@ UCLASS()
 class FISTSOFSNAKE_API AFistsOfSnakeGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+	virtual void StartPlay() override;
 };
+
