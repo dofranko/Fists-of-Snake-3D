@@ -22,12 +22,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
 	// Handles input for moving forward and backward.
 	UFUNCTION()
@@ -59,9 +59,13 @@ public:
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* FPSCameraComponent;
+	UCameraComponent *FPSCameraComponent;
 
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FPSMesh;
+	USkeletalMeshComponent *FPSMesh;
+
+	void SetWantToPickUp();
+
+	bool bWantToPickUp = false;
 };

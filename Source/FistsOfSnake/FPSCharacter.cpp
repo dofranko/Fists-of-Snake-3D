@@ -1,12 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "FPSCharacter.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Create a first person camera component.
@@ -46,7 +45,7 @@ void AFPSCharacter::BeginPlay()
 	Super::BeginPlay();
 	check(GEngine != nullptr);
 
-	// Display a debug message for five seconds. 
+	// Display a debug message for five seconds.
 	// The -1 "Key" value argument prevents the message from being updated or refreshed.
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 }
@@ -55,11 +54,10 @@ void AFPSCharacter::BeginPlay()
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
-void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -77,6 +75,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// Set up "action" bindings.
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+
+	// Set up "PickUp" binding.
+	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AFPSCharacter::SetWantToPickUp);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -104,7 +105,7 @@ void AFPSCharacter::Fire()
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+		MuzzleOffset.Set(80.0f, 0.0f, 0.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
@@ -113,7 +114,7 @@ void AFPSCharacter::Fire()
 		FRotator MuzzleRotation = CameraRotation;
 		MuzzleRotation.Pitch += 10.0f;
 
-		UWorld* World = GetWorld();
+		UWorld *World = GetWorld();
 		if (World)
 		{
 			FActorSpawnParameters SpawnParams;
@@ -121,7 +122,7 @@ void AFPSCharacter::Fire()
 			SpawnParams.Instigator = GetInstigator();
 
 			// Spawn the projectile at the muzzle.
-			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			AFPSProjectile *Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
 			if (Projectile)
 			{
 				// Set the projectile's initial trajectory.
@@ -134,10 +135,15 @@ void AFPSCharacter::Fire()
 
 void AFPSCharacter::StartJump()
 {
-	bPressedJump = true;
+	this->bPressedJump = true;
 }
 
 void AFPSCharacter::StopJump()
 {
-	bPressedJump = false;
+	this->bPressedJump = false;
+}
+
+void AFPSCharacter::SetWantToPickUp()
+{
+	this->bWantToPickUp = true;
 }
