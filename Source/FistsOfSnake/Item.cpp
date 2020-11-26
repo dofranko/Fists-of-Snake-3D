@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Item.h"
 #include <Runtime\Engine\Classes\Kismet\KismetSystemLibrary.h>
 #include <Runtime\Engine\Public\DrawDebugHelpers.h>
-#include "Item.h"
 
 // Sets default values
 AItem::AItem()
@@ -82,4 +82,13 @@ void AItem::OnOverlapEnd(class UPrimitiveComponent* OverlappedComponent,
 {
 	this->bItemWithinRange = false;
 	this->Player = NULL;
+}
+
+void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams)
+{
+
+}
+
+void AItem::Reload() {
+
 }

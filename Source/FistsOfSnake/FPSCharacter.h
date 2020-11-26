@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "FPSProjectile.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "FPSCharacter.generated.h"
+
+//Forward include
+class AWeapon;
+
 
 UCLASS()
 class FISTSOFSNAKE_API AFPSCharacter : public ACharacter
@@ -39,15 +42,15 @@ public:
 
 	// Function that handles firing projectiles.
 	UFUNCTION()
-	void Fire();
+	void UseItem();
 
 	// Gun muzzle offset from the camera location.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;
 
-	// Projectile class to spawn.
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AFPSProjectile> ProjectileClass;
+	// Actualy used item in hands
+	UPROPERTY(EditDefaultsOnly, Category = Item)
+	AWeapon* EquippedItem;
 
 	// Sets jump flag when key is pressed.
 	UFUNCTION()
@@ -57,6 +60,10 @@ public:
 	UFUNCTION()
 	void StopJump();
 
+	//Tries to Reload weapon
+	UFUNCTION()
+	void Reload();
+
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent *FPSCameraComponent;
@@ -65,7 +72,12 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
+	// First-person mesh (arms), visible only to the owning player.
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* WeaponMesh;
+
 	void SetWantToPickUp();
 
 	bool bWantToPickUp = false;
+
 };

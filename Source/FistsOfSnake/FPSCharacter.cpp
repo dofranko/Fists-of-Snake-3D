@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FPSCharacter.h"
-
+#include <Runtime\Engine\Public\EngineUtils.h>
+#include "Weapon.h"
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -35,8 +36,25 @@ AFPSCharacter::AFPSCharacter()
 	FPSMesh->bCastDynamicShadow = false;
 	FPSMesh->CastShadow = false;
 
+	// Create a first person mesh component for the owning player.
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonWeaponMesh"));
+	check(WeaponMesh != nullptr);
+
+	// Attach the FPS mesh to the FPS camera.
+	WeaponMesh->SetupAttachment(FPSCameraComponent);
+
 	// The owning player doesn't see the regular (third-person) body mesh.
 	GetMesh()->SetOwnerNoSee(true);
+
+	if (!EquippedItem) {
+		FVector SpawnLocation(0.f, -30.f, 500.0f);
+		FRotator Rotation(0.f, 90.f, 0.0f);
+		UWorld* World = GetWorld();
+		if (World) {
+			EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
+			EquippedItem->SetActorTickEnabled(false);
+		}
+	}
 }
 
 // Called when the game starts or when spawned
@@ -54,6 +72,7 @@ void AFPSCharacter::BeginPlay()
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 // Called to bind functionality to input
@@ -70,7 +89,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPSCharacter::AddControllerPitchInput);
 
 	// Set up "Fire" binding
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
+	PlayerInputComponent->BindAction("UseItem", IE_Pressed, this, &AFPSCharacter::UseItem);
 
 	// Set up "action" bindings.
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
@@ -78,6 +97,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCompon
 
 	// Set up "PickUp" binding.
 	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AFPSCharacter::SetWantToPickUp);
+
+	// Set up "Reload" binding.
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -94,10 +116,12 @@ void AFPSCharacter::MoveRight(float Value)
 	AddMovementInput(Direction, Value);
 }
 
-void AFPSCharacter::Fire()
+void AFPSCharacter::UseItem()
 {
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Using Item"));
 	// Attempt to fire a projectile.
-	if (ProjectileClass)
+	if (EquippedItem)
 	{
 		// Get the camera transform.
 		FVector CameraLocation;
@@ -105,31 +129,19 @@ void AFPSCharacter::Fire()
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(80.0f, 0.0f, 0.0f);
+		MuzzleOffset.Set(120.0f, 0.0f, 45.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
 
 		// Skew the aim to be slightly upwards.
 		FRotator MuzzleRotation = CameraRotation;
-		MuzzleRotation.Pitch += 10.0f;
 
-		UWorld *World = GetWorld();
-		if (World)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = GetInstigator();
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = GetInstigator();
+		EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
 
-			// Spawn the projectile at the muzzle.
-			AFPSProjectile *Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
-			if (Projectile)
-			{
-				// Set the projectile's initial trajectory.
-				FVector LaunchDirection = MuzzleRotation.Vector();
-				Projectile->FireInDirection(LaunchDirection);
-			}
-		}
 	}
 }
 
@@ -146,4 +158,8 @@ void AFPSCharacter::StopJump()
 void AFPSCharacter::SetWantToPickUp()
 {
 	this->bWantToPickUp = true;
+}
+
+void AFPSCharacter::Reload() {
+	EquippedItem->Reload();
 }

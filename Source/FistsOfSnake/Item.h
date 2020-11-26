@@ -70,4 +70,7 @@ public:
 			class UPrimitiveComponent* OtherComp,
 			int32 OtherBodyIndex);
 
+	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+
+	void Reload();
 };

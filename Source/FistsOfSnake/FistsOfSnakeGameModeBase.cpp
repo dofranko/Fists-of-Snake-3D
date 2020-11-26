@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+#include "FistsOfSnakeGameModeBase.h"
 #include <Runtime\Engine\Public\EngineUtils.h>
 #include "Weapon.h"
-#include "FistsOfSnakeGameModeBase.h"
 
 void AFistsOfSnakeGameModeBase::StartPlay()
 {
@@ -30,4 +30,6 @@ void AFistsOfSnakeGameModeBase::StartPlay()
 	USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
 	Weapon1->WeaponMesh->SetSkeletalMesh(SkeletalMesh);
 	Weapon2->WeaponMesh->SetSkeletalMesh(SkeletalMesh);
+	Weapon1->SetActorEnableCollision(false);
+	Weapon2->SetActorEnableCollision(false);
 }
