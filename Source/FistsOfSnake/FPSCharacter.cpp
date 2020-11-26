@@ -77,6 +77,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// Set up "action" bindings.
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+
+	// Set up "PickUp" binding.
+	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AFPSCharacter::SetWantToPickUp);
 }
 
 void AFPSCharacter::MoveForward(float Value)
@@ -104,7 +107,7 @@ void AFPSCharacter::Fire()
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+		MuzzleOffset.Set(80.0f, 0.0f, 0.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
@@ -134,10 +137,15 @@ void AFPSCharacter::Fire()
 
 void AFPSCharacter::StartJump()
 {
-	bPressedJump = true;
+	this->bPressedJump = true;
 }
 
 void AFPSCharacter::StopJump()
 {
-	bPressedJump = false;
+	this->bPressedJump = false;
+}
+
+void AFPSCharacter::SetWantToPickUp()
+{
+	this->bWantToPickUp = true;
 }

@@ -64,4 +64,9 @@ public:
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* FPSMesh;
+
+	void SetWantToPickUp();
+
+	bool bWantToPickUp = false;
+
 };
