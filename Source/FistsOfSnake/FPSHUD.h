@@ -3,9 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FPSCharacter.h"
 #include "GameFramework/HUD.h"
 #include "Engine/Canvas.h" 
+#include "Kismet/GameplayStatics.h"
 #include "FPSHUD.generated.h"
+
+//Forward include
+class AFPSCharacter;
+class AWeapon;
 
 /**
  * 
@@ -20,6 +26,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UTexture2D* CrosshairTexture;
 
+	UPROPERTY()
+	int AmmoMagazine;
+
+	// Snip from header.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font")
+		UFont* FontType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font")
+		bool bScalePosition;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font")
+		FLinearColor FontColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
+		float PositionXAmmunitionTotal;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
+		float PositionYAmmunitionTotal;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
+		float FontSizeAmmunitionTotal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
+		float PositionXAmmunitionMagazine;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
+		float PositionYAmmunitionMagazine;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
+		float FontSizeAmmunitionMagazine;
 public:
 	// Primary draw call for the HUD.
 	virtual void DrawHUD() override;

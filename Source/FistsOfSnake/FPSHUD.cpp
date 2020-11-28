@@ -2,11 +2,14 @@
 
 
 #include "FPSHUD.h"
+#include "Math/Color.h"
+#include "FPSCharacter.h"
+#include "Weapon.h"
+#include "Fonts/SlateFontInfo.h"
 
 void AFPSHUD::DrawHUD()
 {
     Super::DrawHUD();
-
     if (CrosshairTexture)
     {
         // Find the center of our canvas.
@@ -20,4 +23,14 @@ void AFPSHUD::DrawHUD()
         TileItem.BlendMode = SE_BLEND_Translucent;
         Canvas->DrawItem(TileItem);
     }
+    ACharacter* mainPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (mainPlayer) {
+        AFPSCharacter* mainPl = Cast<AFPSCharacter>(mainPlayer);
+        int AmmunitionTotal = mainPl->EquippedItem->AmmunitionTotal;
+        DrawText(FString::SanitizeFloat(AmmunitionTotal), FontColor, PositionXAmmunitionTotal, PositionYAmmunitionTotal, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+        int AmmunitionMagazine = mainPl->EquippedItem->AmmunitionMagazine;
+        DrawText(FString::SanitizeFloat(AmmunitionMagazine), FontColor, PositionXAmmunitionMagazine, PositionYAmmunitionMagazine, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+    }
+
+    
 }
