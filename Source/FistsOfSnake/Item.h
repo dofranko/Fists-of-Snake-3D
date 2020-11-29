@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FPSCharacter.h"
+#include "Inventory.h"
 #include <Runtime\Engine\Classes\Components\BoxComponent.h>
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -25,52 +26,30 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	// nazwa obiektu
-	UPROPERTY(EditAnywhere)
-		FString ItemName = FString(TEXT(""));
+	// Object's name
+	FString ItemName;
 
-	// nazwa mesha
-	UPROPERTY(EditAnywhere)
-		FString MeshName = FString(TEXT(""));
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+		USkeletalMeshComponent* SkeletalMesh;
 
-	// rotacja obiektu
+	// Object rotation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 		FRotator RotationRate;
 
-	// prêdkoœæ rotacji
+	// Rotation speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 		float RotationSpeed;
 
-	// SceneComponent jest rootem obiektów
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
-		USceneComponent* SceneComponent;
+	// Array of players
+	TArray<AFPSCharacter*> Players;
 
-	// nak³adka na obiekt, by wykrywaæ kolizjê
-	UPROPERTY(EditAnywhere)
-		UBoxComponent* BoxCollider;
+	// To pick up an item
+	void PickUp(AFPSCharacter* Player);
 
-	void PickUp();
+	// When an item is picked up it has to disappear
+	void HideOrExposeMe(bool bFlag);
 
-	AFPSCharacter* Player;
+	// To throw an item in front of a player
+	void ThrowMe(AFPSCharacter* Player);
 
-	bool bItemWithinRange = false;
-
-	//TODO obiekt playera
-
-	UFUNCTION()
-		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent, 
-			class AActor* OtherActor, 
-			class UPrimitiveComponent* OtherComp, 
-			int32 OtherBodyIndex, 
-			bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-		void OnOverlapEnd(class UPrimitiveComponent* OverlappedComponent, 
-			class AActor* OtherActor, 
-			class UPrimitiveComponent* OtherComp,
-			int32 OtherBodyIndex);
-
-	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
-
-	void Reload();
 };

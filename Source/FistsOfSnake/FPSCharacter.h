@@ -10,7 +10,8 @@
 
 //Forward include
 class AWeapon;
-
+class AItem;
+class Inventory;
 
 UCLASS()
 class FISTSOFSNAKE_API AFPSCharacter : public ACharacter
@@ -52,13 +53,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Item)
 	AWeapon* EquippedItem;
 
-	// Sets jump flag when key is pressed.
+	// Change jump flag when key is pressed.
 	UFUNCTION()
-	void StartJump();
-
-	// Clears jump flag when key is released.
-	UFUNCTION()
-	void StopJump();
+	void PlayerJump();
 
 	//Tries to Reload weapon
 	UFUNCTION()
@@ -79,5 +76,11 @@ public:
 	void SetWantToPickUp();
 
 	bool bWantToPickUp = false;
+
+	void ThrowItem();
+
+	void ShiftItem();
+
+	Inventory* MyInventory;
 
 };

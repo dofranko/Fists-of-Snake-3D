@@ -6,8 +6,9 @@
 AWeapon::AWeapon()
 {
 
-	this->WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletalMesh"));
-	this->WeaponMesh->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	this->SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletalMesh"));
+	this->RootComponent = this->SkeletalMesh;
+
 	if (!ProjectileClass) {
 		ProjectileClass = AFPSProjectile::StaticClass();
 	}

@@ -20,9 +20,6 @@ public:
 
 	AWeapon();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
-		USkeletalMeshComponent* WeaponMesh;
-
 	// Projectile class to spawn.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AFPSProjectile> ProjectileClass;
