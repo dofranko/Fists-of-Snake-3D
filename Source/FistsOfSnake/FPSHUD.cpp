@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "FPSHUD.h"
 #include "Math/Color.h"
 #include "FPSCharacter.h"
@@ -23,14 +22,19 @@ void AFPSHUD::DrawHUD()
         TileItem.BlendMode = SE_BLEND_Translucent;
         Canvas->DrawItem(TileItem);
     }
-    ACharacter* mainPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-    if (mainPlayer) {
-        AFPSCharacter* mainPl = Cast<AFPSCharacter>(mainPlayer);
-        int AmmunitionTotal = mainPl->EquippedItem->AmmunitionTotal;
-        DrawText(FString::SanitizeFloat(AmmunitionTotal), FontColor, PositionXAmmunitionTotal, PositionYAmmunitionTotal, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-        int AmmunitionMagazine = mainPl->EquippedItem->AmmunitionMagazine;
-        DrawText(FString::SanitizeFloat(AmmunitionMagazine), FontColor, PositionXAmmunitionMagazine, PositionYAmmunitionMagazine, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+    ACharacter *mainPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (mainPlayer)
+    {
+        AFPSCharacter *mainFpsPlayer = Cast<AFPSCharacter>(mainPlayer);
+        if (mainFpsPlayer)
+        {
+            if (mainFpsPlayer->EquippedItem)
+            {
+                int AmmunitionTotal = mainFpsPlayer->EquippedItem->AmmunitionTotal;
+                DrawText(FString::SanitizeFloat(AmmunitionTotal), FontColor, PositionXAmmunitionTotal, PositionYAmmunitionTotal, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+                int AmmunitionMagazine = mainFpsPlayer->EquippedItem->AmmunitionMagazine;
+                DrawText(FString::SanitizeFloat(AmmunitionMagazine), FontColor, PositionXAmmunitionMagazine, PositionYAmmunitionMagazine, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+            }
+        }
     }
-
-    
 }
