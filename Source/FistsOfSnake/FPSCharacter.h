@@ -25,6 +25,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	int Health;
 
 public:
 	// Called every frame
@@ -51,7 +52,7 @@ public:
 
 	// Actualy used item in hands
 	UPROPERTY(EditDefaultsOnly, Category = Item)
-	AWeapon* EquippedItem;
+	AWeapon *EquippedItem;
 
 	// Change jump flag when key is pressed.
 	UFUNCTION()
@@ -71,7 +72,14 @@ public:
 
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* WeaponMesh;
+	USkeletalMeshComponent *WeaponMesh;
+	
+	UFUNCTION()
+		int GetHealth();
+	
+
+	UPROPERTY(VisibleAnywhere)
+	bool bAlive;
 
 	void SetWantToPickUp();
 
@@ -81,6 +89,8 @@ public:
 
 	void ShiftItem();
 
-	Inventory* MyInventory;
+	void DamageMe(int damage);
+
+		Inventory *MyInventory;
 
 };

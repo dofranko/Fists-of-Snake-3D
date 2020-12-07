@@ -41,6 +41,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Movement)
 	UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
+	UPROPERTY(VisibleAnywhere, Category = Projectile)
+		int damage;
+
 	// Function that initializes the projectile's velocity in the shoot direction.
 	void FireInDirection(const FVector& ShootDirection);
 

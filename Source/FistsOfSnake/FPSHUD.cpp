@@ -28,12 +28,19 @@ void AFPSHUD::DrawHUD()
         AFPSCharacter *mainFpsPlayer = Cast<AFPSCharacter>(mainPlayer);
         if (mainFpsPlayer)
         {
-            if (mainFpsPlayer->EquippedItem)
+            AWeapon *playerWeapon = Cast<AWeapon>(mainFpsPlayer->EquippedItem);
+            if (playerWeapon)
             {
-                int AmmunitionTotal = mainFpsPlayer->EquippedItem->AmmunitionTotal;
-                DrawText(FString::SanitizeFloat(AmmunitionTotal), FontColor, PositionXAmmunitionTotal, PositionYAmmunitionTotal, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-                int AmmunitionMagazine = mainFpsPlayer->EquippedItem->AmmunitionMagazine;
-                DrawText(FString::SanitizeFloat(AmmunitionMagazine), FontColor, PositionXAmmunitionMagazine, PositionYAmmunitionMagazine, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+                int AmmunitionTotal = playerWeapon->AmmunitionTotal;
+                DrawText(FString::FromInt(AmmunitionTotal), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+                int AmmunitionMagazine = playerWeapon->AmmunitionMagazine;
+                DrawText(FString::FromInt(AmmunitionMagazine), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+            }
+            int playerHealth = mainFpsPlayer->GetHealth();
+
+            if (playerHealth)
+            {
+                DrawText(FString::FromInt(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
             }
         }
     }

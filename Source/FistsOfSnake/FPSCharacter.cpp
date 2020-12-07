@@ -44,8 +44,6 @@ AFPSCharacter::AFPSCharacter()
 
 	// Create player's inventory
 	this->MyInventory = new Inventory();
-
-	
 }
 
 // Called when the game starts or when spawned
@@ -59,28 +57,30 @@ void AFPSCharacter::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 
 	// Create an elementery weapon for player
-	UWorld* World = GetWorld();
-	if (World) {
-		const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
-		TArray<UObject*> Array;
+	UWorld *World = GetWorld();
+	if (World)
+	{
+		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+		TArray<UObject *> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
-		USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
+		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
 		FVector SpawnLocation = this->GetActorLocation() + FVector(-140.0f, -30.0f, 90.0f);
 		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f);
 		this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 		this->EquippedItem->SetActorTickEnabled(false);
 		this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
 		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
-		this->EquippedItem->Players.Add(this);	// in the future -> ArrayOfPlayers
+		this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 		this->EquippedItem->ItemName = FString(TEXT("AR4"));
 	}
+	Health = 100;
+	bAlive = true;
 }
 
 // Called every frame
 void AFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -156,7 +156,6 @@ void AFPSCharacter::UseItem()
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
 		EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
-
 	}
 }
 
@@ -172,21 +171,21 @@ void AFPSCharacter::SetWantToPickUp()
 
 void AFPSCharacter::ThrowItem()
 {
-	AItem* ItemToThrow = this->MyInventory->GetItemToThrow();
+	AItem *ItemToThrow = this->MyInventory->GetItemToThrow();
 	if (ItemToThrow)
 		ItemToThrow->ThrowMe(this);
 }
 
 void AFPSCharacter::ShiftItem()
 {
-	if(EquippedItem)
+	if (EquippedItem)
 	{
 		this->EquippedItem->SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		this->EquippedItem->SetActorHiddenInGame(true);
 		this->MyInventory->AddItem(this->EquippedItem);
 	}
 	this->EquippedItem = this->MyInventory->GetWeapon();
-	if (EquippedItem) 
+	if (EquippedItem)
 	{
 		FVector CameraLocation;
 		FRotator CameraRotation;
@@ -202,6 +201,27 @@ void AFPSCharacter::ShiftItem()
 	}
 }
 
-void AFPSCharacter::Reload() {
+void AFPSCharacter::Reload()
+{
 	EquippedItem->Reload();
 }
+
+void AFPSCharacter::DamageMe(int damage)
+{
+	if (Health > 0) {
+		Health -= damage;
+	}
+	if (Health > 100)
+		Health = 100;
+	if (Health <= 0) {
+		bAlive = false;
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Im dead"));
+		Destroy();
+
+	}
+}
+
+int AFPSCharacter::GetHealth() {
+	return this->Health;
+}
+

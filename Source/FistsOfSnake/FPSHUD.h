@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "FPSCharacter.h"
 #include "GameFramework/HUD.h"
-#include "Engine/Canvas.h" 
+#include "Engine/Canvas.h"
 #include "Kismet/GameplayStatics.h"
 #include "FPSHUD.generated.h"
 
@@ -20,18 +20,18 @@ UCLASS()
 class FISTSOFSNAKE_API AFPSHUD : public AHUD
 {
 	GENERATED_BODY()
-	
+
 protected:
 	// This will be drawn at the center of the screen.
 	UPROPERTY(EditDefaultsOnly)
-	UTexture2D* CrosshairTexture;
+		UTexture2D *CrosshairTexture;
 
 	UPROPERTY()
-	int AmmoMagazine;
+		int AmmoMagazine;
 
 	// Snip from header.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font")
-		UFont* FontType;
+		UFont *FontType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font")
 		bool bScalePosition;
@@ -39,18 +39,21 @@ protected:
 		FLinearColor FontColor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
-		float PositionXAmmunitionTotal;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
-		float PositionYAmmunitionTotal;
+		FVector2D PositionAmmunitionTotal;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Total")
 		float FontSizeAmmunitionTotal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
-		float PositionXAmmunitionMagazine;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
-		float PositionYAmmunitionMagazine;
+		FVector2D PositionAmmunitionMagazine;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
 		float FontSizeAmmunitionMagazine;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
+		FVector2D PositionHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
+		float FontSizeHealth;
+
+
 public:
 	// Primary draw call for the HUD.
 	virtual void DrawHUD() override;

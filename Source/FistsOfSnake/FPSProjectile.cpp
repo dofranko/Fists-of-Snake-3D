@@ -3,6 +3,7 @@
 
 #include "FPSProjectile.h"
 #include "FPSCharacter.h"
+#include "Weapon.h"
 // Sets default values
 AFPSProjectile::AFPSProjectile()
 {
@@ -64,8 +65,12 @@ AFPSProjectile::AFPSProjectile()
 	ProjectileMeshComponent->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
 	ProjectileMeshComponent->SetupAttachment(RootComponent);
 
+	if (!damage)
+		damage = 11;
+
 	// Delete the projectile after 3 seconds.
 	InitialLifeSpan = 5.0f;
+
 }
 
 // Called when the game starts or when spawned
@@ -91,12 +96,13 @@ void AFPSProjectile::FireInDirection(const FVector& ShootDirection)
 // Function that is called when the projectile hits something.
 void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherComponent->IsA(AFPSCharacter::StaticClass())) {
+	AFPSCharacter* enemy = Cast<AFPSCharacter>(OtherActor);
+	if (enemy) {
 		if (OtherActor != this && OtherComponent->IsSimulatingPhysics())
 		{
 			OtherComponent->AddImpulseAtLocation(ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint);
 		}
-
+		enemy->DamageMe(damage);
 		Destroy();
 	}
 }
