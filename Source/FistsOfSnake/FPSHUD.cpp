@@ -1,12 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "FPSHUD.h"
+#include "Math/Color.h"
+#include "FPSCharacter.h"
+#include "Weapon.h"
+#include "Fonts/SlateFontInfo.h"
 
 void AFPSHUD::DrawHUD()
 {
     Super::DrawHUD();
-
     if (CrosshairTexture)
     {
         // Find the center of our canvas.
@@ -19,5 +21,27 @@ void AFPSHUD::DrawHUD()
         FCanvasTileItem TileItem(CrossHairDrawPosition, CrosshairTexture->Resource, FLinearColor::White);
         TileItem.BlendMode = SE_BLEND_Translucent;
         Canvas->DrawItem(TileItem);
+    }
+    ACharacter *mainPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (mainPlayer)
+    {
+        AFPSCharacter *mainFpsPlayer = Cast<AFPSCharacter>(mainPlayer);
+        if (mainFpsPlayer)
+        {
+            AWeapon *playerWeapon = Cast<AWeapon>(mainFpsPlayer->EquippedItem);
+            if (playerWeapon)
+            {
+                int AmmunitionTotal = playerWeapon->AmmunitionTotal;
+                DrawText(FString::FromInt(AmmunitionTotal), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+                int AmmunitionMagazine = playerWeapon->AmmunitionMagazine;
+                DrawText(FString::FromInt(AmmunitionMagazine), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+            }
+            int playerHealth = mainFpsPlayer->GetHealth();
+
+            if (playerHealth)
+            {
+                DrawText(FString::FromInt(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
+            }
+        }
     }
 }

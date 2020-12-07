@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "FPSProjectile.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "FPSCharacter.generated.h"
+
+//Forward include
+class AWeapon;
+class AItem;
+class Inventory;
 
 UCLASS()
 class FISTSOFSNAKE_API AFPSCharacter : public ACharacter
@@ -21,13 +25,14 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	int Health;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
 	// Handles input for moving forward and backward.
 	UFUNCTION()
@@ -39,29 +44,53 @@ public:
 
 	// Function that handles firing projectiles.
 	UFUNCTION()
-	void Fire();
+	void UseItem();
 
 	// Gun muzzle offset from the camera location.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;
 
-	// Projectile class to spawn.
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AFPSProjectile> ProjectileClass;
+	// Actualy used item in hands
+	UPROPERTY(EditDefaultsOnly, Category = Item)
+	AWeapon *EquippedItem;
 
-	// Sets jump flag when key is pressed.
+	// Change jump flag when key is pressed.
 	UFUNCTION()
-	void StartJump();
+	void PlayerJump();
 
-	// Clears jump flag when key is released.
+	//Tries to Reload weapon
 	UFUNCTION()
-	void StopJump();
+	void Reload();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* FPSCameraComponent;
+	UCameraComponent *FPSCameraComponent;
 
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FPSMesh;
+	USkeletalMeshComponent *FPSMesh;
+
+	// First-person mesh (arms), visible only to the owning player.
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent *WeaponMesh;
+	
+	UFUNCTION()
+		int GetHealth();
+	
+
+	UPROPERTY(VisibleAnywhere)
+	bool bAlive;
+
+	void SetWantToPickUp();
+
+	bool bWantToPickUp = false;
+
+	void ThrowItem();
+
+	void ShiftItem();
+
+	void DamageMe(int damage);
+
+		Inventory *MyInventory;
+
 };
