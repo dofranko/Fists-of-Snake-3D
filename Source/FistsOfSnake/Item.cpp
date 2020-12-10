@@ -64,8 +64,13 @@ void AItem::HideOrExposeMe(bool bFlag)
 
 void AItem::ThrowMe(AFPSCharacter* Player)
 {
+	this->SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	FVector PlayerLocation = Player->GetActorLocation();
 	FVector PlayerForwardVector = Player->GetActorForwardVector();
 	this->SetActorLocation(PlayerLocation + PlayerForwardVector*200);
 	HideOrExposeMe(false);
 }
+
+void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {}
+
+void AItem::Reload() {}

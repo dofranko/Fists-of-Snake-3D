@@ -29,17 +29,20 @@ public:
 	// Object's name
 	FString ItemName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		USkeletalMeshComponent* SkeletalMesh;
 
 	// Object rotation
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		FRotator RotationRate;
 
 	// Rotation speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 		float RotationSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Icon)
+		UTexture2D* ItemIcon;
+	
 	// Array of players
 	TArray<AFPSCharacter*> Players;
 
@@ -51,5 +54,11 @@ public:
 
 	// To throw an item in front of a player
 	void ThrowMe(AFPSCharacter* Player);
+
+	// Activate an item
+	virtual void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+
+	// Reload a weapon
+	virtual void Reload();
 
 };

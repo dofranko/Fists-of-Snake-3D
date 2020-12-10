@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Font Ammunition Magazine")
 		float FontSizeHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD Inventory")
+		FVector2D PositionInventory;
+
 
 public:
 	// Primary draw call for the HUD.

@@ -72,6 +72,12 @@ void AFPSCharacter::BeginPlay()
 		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
 		this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 		this->EquippedItem->ItemName = FString(TEXT("AR4"));
+		TArray<UObject*> Array2;
+		EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons") , Array2, EngineUtils::ATL_Regular);
+		UTexture2D* texture = Cast<UTexture2D>(Array2[1]);
+		this->EquippedItem->ItemIcon = texture;
+		this->EquippedItemIndex = 0;
+		this->MyInventory->AddItem(this->EquippedItem);
 	}
 	Health = 100;
 	bAlive = true;
@@ -110,8 +116,14 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCompon
 	// Set up "ThrowItem" binding.
 	PlayerInputComponent->BindAction("ThrowItem", IE_Pressed, this, &AFPSCharacter::ThrowItem);
 
-	// Set up "ThrowItem" binding.
-	PlayerInputComponent->BindAction("ShiftItem", IE_Pressed, this, &AFPSCharacter::ShiftItem);
+	// Set up "ChooseItem" binding.
+	// To invoke ChooseItem with parameter in BindAction<>()
+	DECLARE_DELEGATE_OneParam(FCustomInputDelegate, int);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem1", IE_Pressed, this, &AFPSCharacter::ChooseItem, 0);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem2", IE_Pressed, this, &AFPSCharacter::ChooseItem, 1);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem3", IE_Pressed, this, &AFPSCharacter::ChooseItem, 2);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem4", IE_Pressed, this, &AFPSCharacter::ChooseItem, 3);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem5", IE_Pressed, this, &AFPSCharacter::ChooseItem, 4);
 
 	// Set up "Reload" binding.
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
@@ -155,7 +167,7 @@ void AFPSCharacter::UseItem()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
-		EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
+		this->EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
 	}
 }
 
@@ -171,22 +183,29 @@ void AFPSCharacter::SetWantToPickUp()
 
 void AFPSCharacter::ThrowItem()
 {
-	AItem *ItemToThrow = this->MyInventory->GetItemToThrow();
-	if (ItemToThrow)
-		ItemToThrow->ThrowMe(this);
+	if (this->EquippedItem)
+	{
+		this->MyInventory->RemoveItem(this->EquippedItemIndex);
+		this->EquippedItem->ThrowMe(this);
+		this->EquippedItem = nullptr;
+		this->EquippedItemIndex = -1;
+	}
 }
 
-void AFPSCharacter::ShiftItem()
+void AFPSCharacter::ChooseItem(int Index)
 {
+	if (Index == this->EquippedItemIndex)		// not to change the same item
+		return;
 	if (EquippedItem)
 	{
 		this->EquippedItem->SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		this->EquippedItem->SetActorHiddenInGame(true);
-		this->MyInventory->AddItem(this->EquippedItem);
+		this->EquippedItemIndex = -1;
 	}
-	this->EquippedItem = this->MyInventory->GetWeapon();
+	this->EquippedItem = this->MyInventory->GetItem(Index);
 	if (EquippedItem)
 	{
+		this->EquippedItemIndex = Index;
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		this->GetActorEyesViewPoint(CameraLocation, CameraRotation);
@@ -203,7 +222,7 @@ void AFPSCharacter::ShiftItem()
 
 void AFPSCharacter::Reload()
 {
-	EquippedItem->Reload();
+	this->EquippedItem->Reload();
 }
 
 void AFPSCharacter::DamageMe(int damage)

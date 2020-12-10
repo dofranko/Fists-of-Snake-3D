@@ -7,47 +7,38 @@
 
 Inventory::Inventory()
 {
-	this->capacity = 20;
+	this->Size = 5;
+	this->ArrayOfItems.Init(nullptr, this->Size);
 }
 
 bool Inventory::AddItem(AItem* Item)
 {
-	if (this->capacity > this->ArrayOfItems.Num())
+	for (int Index = 0; Index != this->Size; ++Index)
 	{
-		this->ArrayOfItems.Add(Item);
-		return true;
+		if (!this->ArrayOfItems[Index])
+		{
+			this->ArrayOfItems[Index] = Item;
+			return true;
+		}
 	}
 	return false;
 }
 
-AItem* Inventory::GetItem(uint8 index)
+
+void Inventory::RemoveItem(int Index)
 {
-	return this->ArrayOfItems[index];
+	this->ArrayOfItems[Index] = nullptr;
 }
 
-AItem* Inventory::RemoveItem(uint8 index)
+AItem* Inventory::GetItem(int Index)
 {
-
-	return this->ArrayOfItems[index];
+	return this->ArrayOfItems[Index];
 }
 
-AItem* Inventory::GetItemToThrow()
+UTexture2D* Inventory::GetItemIcon(int Index)
 {
-	if(this->ArrayOfItems.Num() != 0)
-		return this->ArrayOfItems.Pop();
-	return nullptr;
-}
-
-AWeapon* Inventory::GetWeapon()
-{
-	for (auto& CurrentItem : this->ArrayOfItems)
-	{
-		AWeapon* tmp = Cast<AWeapon>(CurrentItem);
-		if (tmp) {
-			this->ArrayOfItems.RemoveSingle(CurrentItem);
-			return tmp;
-		}
-	}
+	if (this->ArrayOfItems[Index])
+		return this->ArrayOfItems[Index]->ItemIcon;
 	return nullptr;
 }
 

@@ -52,7 +52,8 @@ public:
 
 	// Actualy used item in hands
 	UPROPERTY(EditDefaultsOnly, Category = Item)
-	AWeapon *EquippedItem;
+	AItem *EquippedItem;
+	int EquippedItemIndex = -1;
 
 	// Change jump flag when key is pressed.
 	UFUNCTION()
@@ -75,9 +76,8 @@ public:
 	USkeletalMeshComponent *WeaponMesh;
 	
 	UFUNCTION()
-		int GetHealth();
+	int GetHealth();
 	
-
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;
 
@@ -87,10 +87,10 @@ public:
 
 	void ThrowItem();
 
-	void ShiftItem();
+	void ChooseItem(int index);
 
 	void DamageMe(int damage);
 
-		Inventory *MyInventory;
+	Inventory *MyInventory;
 
 };
