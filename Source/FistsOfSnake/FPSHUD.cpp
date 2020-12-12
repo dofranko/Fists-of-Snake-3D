@@ -4,6 +4,7 @@
 #include "Math/Color.h"
 #include "FPSCharacter.h"
 #include "Weapon.h"
+#include "Grenade.h"
 #include "Fonts/SlateFontInfo.h"
 
 void AFPSHUD::DrawHUD()
@@ -35,11 +36,18 @@ void AFPSHUD::DrawHUD()
                 int AmmunitionMagazine = playerWeapon->AmmunitionMagazine;
                 DrawText(FString::FromInt(AmmunitionMagazine), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
             }
-            int playerHealth = mainFpsPlayer->GetHealth();
 
+            int playerHealth = mainFpsPlayer->GetHealth();
             if (playerHealth)
             {
                 DrawText(FString::FromInt(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
+            }
+
+            AGrenade *PlayerGrenade = Cast<AGrenade>(mainFpsPlayer->EquippedItem);
+            if (PlayerGrenade)
+            {
+                int NumberOfGrenades = PlayerGrenade->NumberOfGrenades;
+                DrawText(FString::FromInt(NumberOfGrenades), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
             }
 
             // Draw slots of the inventory

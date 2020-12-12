@@ -74,7 +74,7 @@ void AFPSCharacter::BeginPlay()
 		this->EquippedItem->ItemName = FString(TEXT("AR4"));
 		TArray<UObject*> Array2;
 		EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons") , Array2, EngineUtils::ATL_Regular);
-		UTexture2D* texture = Cast<UTexture2D>(Array2[1]);
+		UTexture2D* texture = Cast<UTexture2D>(Array2[2]);
 		this->EquippedItem->ItemIcon = texture;
 		this->EquippedItemIndex = 0;
 		this->MyInventory->AddItem(this->EquippedItem);
@@ -168,6 +168,12 @@ void AFPSCharacter::UseItem()
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
 		this->EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
+		if (!this->EquippedItem->bAlive)
+		{
+			this->MyInventory->RemoveItem(this->EquippedItemIndex);
+			this->EquippedItem = nullptr;
+			this->EquippedItemIndex = -1;
+		}
 	}
 }
 

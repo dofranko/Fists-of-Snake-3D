@@ -46,6 +46,9 @@ public:
 	// Array of players
 	TArray<AFPSCharacter*> Players;
 
+	// Flag informs if item was destroyed
+	bool bAlive = true;
+
 	// To pick up an item
 	void PickUp(AFPSCharacter* Player);
 
