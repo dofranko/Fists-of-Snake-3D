@@ -38,17 +38,24 @@ void AItem::Tick(float DeltaTime)
 		// When there is collision with someone
 		if (Distance.Size() < 100)
 		{
-			FString PickUpMessage = FString::Printf(TEXT("Press G to pickup %s"), *ItemName);
-			DrawDebugString(GetWorld(), this->GetActorLocation(),
-				PickUpMessage, nullptr, FColor::Green, 0.0f, true);
-			if (Player->bWantToPickUp)
-				PickUp(Player);
+			OnCollision(Player);
 		}
 	}
-	
 }
 
-void AItem::PickUp(AFPSCharacter* Player)
+void AItem::OnCollision(AFPSCharacter* Player)
+{
+	FString PickUpMessage = FString::Printf(TEXT("Press G to pickup %s"), *ItemName);
+	DrawDebugString(GetWorld(), this->GetActorLocation(), PickUpMessage, nullptr, FColor::Green, 0.0f, true);
+	if (Player->bWantToPickUp)
+	{
+		Player->bWantToPickUp = false;
+		PickUp(Player);
+	}
+		
+}
+
+void AItem::PickUp(AFPSCharacter *Player)
 {
 	if (Player->MyInventory->AddItem(this))
 	{

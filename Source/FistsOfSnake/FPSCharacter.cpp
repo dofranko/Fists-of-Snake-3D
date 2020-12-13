@@ -110,7 +110,6 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::PlayerJump);
 
 	// Set up "PickUp" binding.
-	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AFPSCharacter::SetWantToPickUp);
 	PlayerInputComponent->BindAction("PickUp", IE_Released, this, &AFPSCharacter::SetWantToPickUp);
 
 	// Set up "ThrowItem" binding.
@@ -184,7 +183,7 @@ void AFPSCharacter::PlayerJump()
 
 void AFPSCharacter::SetWantToPickUp()
 {
-	this->bWantToPickUp = !this->bWantToPickUp;
+	this->bWantToPickUp = true;
 }
 
 void AFPSCharacter::ThrowItem()

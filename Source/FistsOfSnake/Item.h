@@ -4,7 +4,6 @@
 
 #include "FPSCharacter.h"
 #include "Inventory.h"
-#include <Runtime\Engine\Classes\Components\BoxComponent.h>
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
@@ -49,8 +48,11 @@ public:
 	// Flag informs if item was destroyed
 	bool bAlive = true;
 
+	// When collision was detected
+	void OnCollision(AFPSCharacter* Player);
+
 	// To pick up an item
-	void PickUp(AFPSCharacter* Player);
+	virtual void PickUp(AFPSCharacter* Player);
 
 	// When an item is picked up it has to disappear
 	void HideOrExposeMe(bool bFlag);
