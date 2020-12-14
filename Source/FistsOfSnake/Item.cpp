@@ -45,14 +45,15 @@ void AItem::Tick(float DeltaTime)
 
 void AItem::OnCollision(AFPSCharacter* Player)
 {
+	Player->bHasCollisionWithItem = true;
 	FString PickUpMessage = FString::Printf(TEXT("Press G to pickup %s"), *ItemName);
 	DrawDebugString(GetWorld(), this->GetActorLocation(), PickUpMessage, nullptr, FColor::Green, 0.0f, true);
 	if (Player->bWantToPickUp)
 	{
 		Player->bWantToPickUp = false;
+		Player->bHasCollisionWithItem = false;
 		PickUp(Player);
 	}
-		
 }
 
 void AItem::PickUp(AFPSCharacter *Player)

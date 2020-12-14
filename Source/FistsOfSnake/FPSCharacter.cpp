@@ -6,6 +6,7 @@
 #include "Item.h"
 #include "Inventory.h"
 
+
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -60,11 +61,22 @@ void AFPSCharacter::BeginPlay()
 	UWorld *World = GetWorld();
 	if (World)
 	{
+		// Iterate through player's CameraManager (multiplayer)
+		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter) 
+		{
+			APlayerController* PlayerController = Iter->Get();
+
+			if (PlayerController && PlayerController->IsLocalController())
+			{
+				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
+			}
+		}
+
 		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 		TArray<UObject *> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
 		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
-		FVector SpawnLocation = this->GetActorLocation() + FVector(-140.0f, -30.0f, 90.0f);
+		FVector SpawnLocation = this->GetActorLocation() + FVector(-120.0f, -30.0f, 85.0f);
 		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f);
 		this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 		this->EquippedItem->SetActorTickEnabled(false);
@@ -152,10 +164,10 @@ void AFPSCharacter::UseItem()
 		// Get the camera transform.
 		FVector CameraLocation;
 		FRotator CameraRotation;
-		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
 
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(120.0f, 0.0f, 45.0f);
+		MuzzleOffset.Set(120.0f, 0.0f, 0.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
@@ -183,7 +195,8 @@ void AFPSCharacter::PlayerJump()
 
 void AFPSCharacter::SetWantToPickUp()
 {
-	this->bWantToPickUp = true;
+	if (this->bHasCollisionWithItem)
+		this->bWantToPickUp = true;
 }
 
 void AFPSCharacter::ThrowItem()
@@ -213,11 +226,12 @@ void AFPSCharacter::ChooseItem(int Index)
 		this->EquippedItemIndex = Index;
 		FVector CameraLocation;
 		FRotator CameraRotation;
-		this->GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
 		FVector OffSet;
-		OffSet.Set(120.0f, 30.0f, 30.0f);
-		FVector Location = CameraLocation + FTransform(CameraRotation).TransformVector(OffSet);
-		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 10.0f);
+		OffSet.Set(120.0f, 30.0f, -30.0f);
+		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
+		FRotator OffSet2(0.0f, -90.0f, 0.0f);
+		FQuat Rotation = FTransform(CameraRotation).TransformRotation(OffSet2.Quaternion());
 		this->EquippedItem->SetActorLocation(Location);
 		this->EquippedItem->SetActorRotation(Rotation);
 		this->EquippedItem->SetActorHiddenInGame(false);

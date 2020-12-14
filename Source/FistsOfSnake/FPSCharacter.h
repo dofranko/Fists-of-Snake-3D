@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
 #include "FPSCharacter.generated.h"
 
 //Forward include
@@ -83,6 +84,8 @@ public:
 
 	void SetWantToPickUp();
 
+	bool bHasCollisionWithItem = false;
+
 	bool bWantToPickUp = false;
 
 	void ThrowItem();
@@ -92,5 +95,7 @@ public:
 	void DamageMe(int damage);
 
 	Inventory *MyInventory;
+	
+	const APlayerCameraManager *ManagerCamera;
 
 };
