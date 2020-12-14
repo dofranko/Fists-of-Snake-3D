@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"UMG"
+				"UMG",
+				"ApexDestruction"
 			]
 		}
 	],
@@ -64,6 +65,10 @@
 		{
 			"Name": "SubversionSourceControl",
 			"Enabled": false
+		},
+		{
+			"Name": "ApexDestruction",
+			"Enabled": true
 		}
 	]
 }

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
 #include "FPSCharacter.generated.h"
 
 //Forward include
@@ -52,7 +53,8 @@ public:
 
 	// Actualy used item in hands
 	UPROPERTY(EditDefaultsOnly, Category = Item)
-	AWeapon *EquippedItem;
+	AItem *EquippedItem;
+	int EquippedItemIndex = -1;
 
 	// Change jump flag when key is pressed.
 	UFUNCTION()
@@ -75,22 +77,25 @@ public:
 	USkeletalMeshComponent *WeaponMesh;
 	
 	UFUNCTION()
-		int GetHealth();
+	int GetHealth();
 	
-
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;
 
 	void SetWantToPickUp();
 
+	bool bHasCollisionWithItem = false;
+
 	bool bWantToPickUp = false;
 
 	void ThrowItem();
 
-	void ShiftItem();
+	void ChooseItem(int index);
 
 	void DamageMe(int damage);
 
-		Inventory *MyInventory;
+	Inventory *MyInventory;
+	
+	const APlayerCameraManager *ManagerCamera;
 
 };

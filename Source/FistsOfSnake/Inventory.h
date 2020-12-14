@@ -6,7 +6,6 @@
 
 //Forward include
 class AItem;
-class AWeapon;
 
 class FISTSOFSNAKE_API Inventory
 {
@@ -14,19 +13,17 @@ public:
 
 	Inventory();
 
-	uint8 capacity = 20;
+	int Size;
 
 	TArray<AItem*> ArrayOfItems;
 
 	bool AddItem(AItem* Item);
 
-	AItem* GetItem(uint8 index);
+	void RemoveItem(int Index);
 
-	AItem* RemoveItem(uint8 index);
+	AItem* GetItem(int Index);
 
-	AItem* GetItemToThrow();
-
-	AWeapon* GetWeapon();
+	UTexture2D* GetItemIcon(int Index);
 
 	~Inventory();
 };
