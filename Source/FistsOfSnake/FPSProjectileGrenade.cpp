@@ -69,6 +69,8 @@ void AFPSProjectileGrenade::OnDetonate()
 	{
 		for (auto& hited : OutHits)
 		{
+			if (!&hited)
+				continue;
 			// Throw away some static mesh
 			UStaticMeshComponent *SM = Cast<UStaticMeshComponent>(hited.GetActor()->GetRootComponent());
 			if (SM)
