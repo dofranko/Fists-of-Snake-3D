@@ -38,17 +38,25 @@ void AItem::Tick(float DeltaTime)
 		// When there is collision with someone
 		if (Distance.Size() < 100)
 		{
-			FString PickUpMessage = FString::Printf(TEXT("Press G to pickup %s"), *ItemName);
-			DrawDebugString(GetWorld(), this->GetActorLocation(),
-				PickUpMessage, nullptr, FColor::Green, 0.0f, true);
-			if (Player->bWantToPickUp)
-				PickUp(Player);
+			OnCollision(Player);
 		}
 	}
-	
 }
 
-void AItem::PickUp(AFPSCharacter* Player)
+void AItem::OnCollision(AFPSCharacter* Player)
+{
+	Player->bHasCollisionWithItem = true;
+	FString PickUpMessage = FString::Printf(TEXT("Press G to pickup %s"), *ItemName);
+	DrawDebugString(GetWorld(), this->GetActorLocation(), PickUpMessage, nullptr, FColor::Green, 0.0f, true);
+	if (Player->bWantToPickUp)
+	{
+		Player->bWantToPickUp = false;
+		Player->bHasCollisionWithItem = false;
+		PickUp(Player);
+	}
+}
+
+void AItem::PickUp(AFPSCharacter *Player)
 {
 	if (Player->MyInventory->AddItem(this))
 	{
@@ -64,8 +72,13 @@ void AItem::HideOrExposeMe(bool bFlag)
 
 void AItem::ThrowMe(AFPSCharacter* Player)
 {
+	this->SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	FVector PlayerLocation = Player->GetActorLocation();
 	FVector PlayerForwardVector = Player->GetActorForwardVector();
 	this->SetActorLocation(PlayerLocation + PlayerForwardVector*200);
 	HideOrExposeMe(false);
 }
+
+void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {}
+
+void AItem::Reload() {}

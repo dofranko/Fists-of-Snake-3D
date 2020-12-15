@@ -6,6 +6,7 @@
 #include "Item.h"
 #include "Inventory.h"
 
+
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -60,11 +61,22 @@ void AFPSCharacter::BeginPlay()
 	UWorld *World = GetWorld();
 	if (World)
 	{
+		// Iterate through player's CameraManager (multiplayer)
+		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter) 
+		{
+			APlayerController* PlayerController = Iter->Get();
+
+			if (PlayerController && PlayerController->IsLocalController())
+			{
+				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
+			}
+		}
+
 		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 		TArray<UObject *> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
 		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
-		FVector SpawnLocation = this->GetActorLocation() + FVector(-140.0f, -30.0f, 90.0f);
+		FVector SpawnLocation = this->GetActorLocation() + FVector(-120.0f, -30.0f, 85.0f);
 		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f);
 		this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 		this->EquippedItem->SetActorTickEnabled(false);
@@ -72,6 +84,12 @@ void AFPSCharacter::BeginPlay()
 		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
 		this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 		this->EquippedItem->ItemName = FString(TEXT("AR4"));
+		TArray<UObject*> Array2;
+		EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons") , Array2, EngineUtils::ATL_Regular);
+		UTexture2D* texture = Cast<UTexture2D>(Array2[2]);
+		this->EquippedItem->ItemIcon = texture;
+		this->EquippedItemIndex = 0;
+		this->MyInventory->AddItem(this->EquippedItem);
 	}
 	Health = 100;
 	bAlive = true;
@@ -104,14 +122,19 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::PlayerJump);
 
 	// Set up "PickUp" binding.
-	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AFPSCharacter::SetWantToPickUp);
 	PlayerInputComponent->BindAction("PickUp", IE_Released, this, &AFPSCharacter::SetWantToPickUp);
 
 	// Set up "ThrowItem" binding.
 	PlayerInputComponent->BindAction("ThrowItem", IE_Pressed, this, &AFPSCharacter::ThrowItem);
 
-	// Set up "ThrowItem" binding.
-	PlayerInputComponent->BindAction("ShiftItem", IE_Pressed, this, &AFPSCharacter::ShiftItem);
+	// Set up "ChooseItem" binding.
+	// To invoke ChooseItem with parameter in BindAction<>()
+	DECLARE_DELEGATE_OneParam(FCustomInputDelegate, int);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem1", IE_Pressed, this, &AFPSCharacter::ChooseItem, 0);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem2", IE_Pressed, this, &AFPSCharacter::ChooseItem, 1);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem3", IE_Pressed, this, &AFPSCharacter::ChooseItem, 2);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem4", IE_Pressed, this, &AFPSCharacter::ChooseItem, 3);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ChooseItem5", IE_Pressed, this, &AFPSCharacter::ChooseItem, 4);
 
 	// Set up "Reload" binding.
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSCharacter::Reload);
@@ -141,10 +164,10 @@ void AFPSCharacter::UseItem()
 		// Get the camera transform.
 		FVector CameraLocation;
 		FRotator CameraRotation;
-		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
 
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(120.0f, 0.0f, 45.0f);
+		MuzzleOffset.Set(120.0f, 0.0f, 0.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
@@ -155,7 +178,13 @@ void AFPSCharacter::UseItem()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
-		EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
+		this->EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
+		if (!this->EquippedItem->bAlive)
+		{
+			this->MyInventory->RemoveItem(this->EquippedItemIndex);
+			this->EquippedItem = nullptr;
+			this->EquippedItemIndex = -1;
+		}
 	}
 }
 
@@ -166,34 +195,43 @@ void AFPSCharacter::PlayerJump()
 
 void AFPSCharacter::SetWantToPickUp()
 {
-	this->bWantToPickUp = !this->bWantToPickUp;
+	if (this->bHasCollisionWithItem)
+		this->bWantToPickUp = true;
 }
 
 void AFPSCharacter::ThrowItem()
 {
-	AItem *ItemToThrow = this->MyInventory->GetItemToThrow();
-	if (ItemToThrow)
-		ItemToThrow->ThrowMe(this);
+	if (this->EquippedItem)
+	{
+		this->MyInventory->RemoveItem(this->EquippedItemIndex);
+		this->EquippedItem->ThrowMe(this);
+		this->EquippedItem = nullptr;
+		this->EquippedItemIndex = -1;
+	}
 }
 
-void AFPSCharacter::ShiftItem()
+void AFPSCharacter::ChooseItem(int Index)
 {
+	if (Index == this->EquippedItemIndex)		// not to change the same item
+		return;
 	if (EquippedItem)
 	{
 		this->EquippedItem->SkeletalMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		this->EquippedItem->SetActorHiddenInGame(true);
-		this->MyInventory->AddItem(this->EquippedItem);
+		this->EquippedItemIndex = -1;
 	}
-	this->EquippedItem = this->MyInventory->GetWeapon();
+	this->EquippedItem = this->MyInventory->GetItem(Index);
 	if (EquippedItem)
 	{
+		this->EquippedItemIndex = Index;
 		FVector CameraLocation;
 		FRotator CameraRotation;
-		this->GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
 		FVector OffSet;
-		OffSet.Set(120.0f, 30.0f, 30.0f);
-		FVector Location = CameraLocation + FTransform(CameraRotation).TransformVector(OffSet);
-		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 10.0f);
+		OffSet.Set(120.0f, 30.0f, -30.0f);
+		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
+		FRotator OffSet2(0.0f, -90.0f, 0.0f);
+		FQuat Rotation = FTransform(CameraRotation).TransformRotation(OffSet2.Quaternion());
 		this->EquippedItem->SetActorLocation(Location);
 		this->EquippedItem->SetActorRotation(Rotation);
 		this->EquippedItem->SetActorHiddenInGame(false);
@@ -203,7 +241,7 @@ void AFPSCharacter::ShiftItem()
 
 void AFPSCharacter::Reload()
 {
-	EquippedItem->Reload();
+	this->EquippedItem->Reload();
 }
 
 void AFPSCharacter::DamageMe(int damage)
