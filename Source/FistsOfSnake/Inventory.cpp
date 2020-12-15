@@ -42,6 +42,17 @@ UTexture2D* Inventory::GetItemIcon(int Index)
 	return nullptr;
 }
 
+void Inventory::DestroyItems()
+{
+	for (int Index = 0; Index != this->Size; ++Index)
+	{
+		if (this->ArrayOfItems[Index])
+		{
+			this->ArrayOfItems[Index]->Destroy();
+		}
+	}
+}
+
 Inventory::~Inventory()
 {
 }
