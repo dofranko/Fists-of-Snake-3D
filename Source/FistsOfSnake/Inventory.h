@@ -25,5 +25,7 @@ public:
 
 	UTexture2D* GetItemIcon(int Index);
 
+	void DestroyItems();
+
 	~Inventory();
 };
