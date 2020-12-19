@@ -69,25 +69,26 @@ void AFPSProjectileGrenade::OnDetonate()
 	{
 		for (auto& hited : OutHits)
 		{
-			if (!&hited)
-				continue;
-			// Throw away some static mesh
-			UStaticMeshComponent *SM = Cast<UStaticMeshComponent>(hited.GetActor()->GetRootComponent());
-			if (SM)
-				SM->AddRadialImpulse(GetActorLocation(), 1000.f, 5000.f, ERadialImpulseFalloff::RIF_Linear, true);
-
-			// Crash some destructible mesh
-			ADestructibleActor *DA = Cast<ADestructibleActor>(hited.GetActor());
-			if (DA)
-				DA->GetDestructibleComponent()->ApplyRadiusDamage(10.f, hited.ImpactPoint, 500.f, 3000.f, false);
-
-			AFPSCharacter *Player = Cast<AFPSCharacter>(hited.GetActor());
-			if (Player)
+			// Check if Actor has benn destroyed
+			if (hited.GetActor())
 			{
-				UPrimitiveComponent* ActorComponent = hited.GetActor()->FindComponentByClass<UPrimitiveComponent>();
-				ActorComponent->AddRadialImpulse(GetActorLocation(), 1000.f, 5000.f, ERadialImpulseFalloff::RIF_Linear, true);
-				Player->DamageMe(this->Damage);
-				// notka -> jak gracz spadnie z rowerka to granat, który trzyma w rêku zostaje, bo obiekt gracza nadal istnieje
+				// Throw away some static mesh
+				UStaticMeshComponent* SM = Cast<UStaticMeshComponent>(hited.GetActor()->GetRootComponent());
+				if (SM)
+					SM->AddRadialImpulse(GetActorLocation(), 1000.f, 5000.f, ERadialImpulseFalloff::RIF_Linear, true);
+
+				// Crash some destructible mesh
+				ADestructibleActor* DA = Cast<ADestructibleActor>(hited.GetActor());
+				if (DA)
+					DA->GetDestructibleComponent()->ApplyRadiusDamage(10.f, hited.ImpactPoint, 500.f, 3000.f, false);
+
+				AFPSCharacter* Player = Cast<AFPSCharacter>(hited.GetActor());
+				if (Player)
+				{
+					UPrimitiveComponent* ActorComponent = hited.GetActor()->FindComponentByClass<UPrimitiveComponent>();
+					ActorComponent->AddRadialImpulse(GetActorLocation(), 1000.f, 5000.f, ERadialImpulseFalloff::RIF_Linear, true);
+					Player->DamageMe(this->Damage);
+				}
 			}
 		}
 	}

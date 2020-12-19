@@ -32,14 +32,19 @@ void AItem::Tick(float DeltaTime)
 
 	for (auto& Player : this->Players)
 	{
-		FVector PlayerLocation = Player->GetActorLocation();
-		FVector Distance = PlayerLocation - this->GetActorLocation();
-
-		// When there is collision with someone
-		if (Distance.Size() < 100)
+		// Check if Player is dead
+		if (Player->GetHealth() > 0)
 		{
-			OnCollision(Player);
+			FVector PlayerLocation = Player->GetActorLocation();
+			FVector Distance = PlayerLocation - this->GetActorLocation();
+
+			// When there is collision with someone
+			if (Distance.Size() < 100)
+			{
+				OnCollision(Player);
+			}
 		}
+		
 	}
 }
 
@@ -61,6 +66,10 @@ void AItem::PickUp(AFPSCharacter *Player)
 	if (Player->MyInventory->AddItem(this))
 	{
 		HideOrExposeMe(true);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("The inventory is full"));
 	}
 }
 

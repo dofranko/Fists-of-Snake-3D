@@ -254,6 +254,7 @@ void AFPSCharacter::DamageMe(int damage)
 	if (Health <= 0) {
 		bAlive = false;
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Im dead"));
+		MyInventory->DestroyItems();
 		Destroy();
 
 	}
