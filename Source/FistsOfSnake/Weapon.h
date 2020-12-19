@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/World.h"
 #include "Item.h"
 #include "FPSProjectile.h"
-#include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 #include "Weapon.generated.h"
+
 
 /**
  * 
@@ -41,6 +43,7 @@ public:
 
 	bool bReloading;
 
+	UFUNCTION(Server, Reliable)
 	void Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
 
 	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);

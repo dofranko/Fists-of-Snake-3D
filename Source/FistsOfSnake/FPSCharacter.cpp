@@ -5,6 +5,8 @@
 #include "Weapon.h"
 #include "Item.h"
 #include "Inventory.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
 
 
 // Sets default values
@@ -45,6 +47,10 @@ AFPSCharacter::AFPSCharacter()
 
 	// Create player's inventory
 	this->MyInventory = new Inventory();
+
+	// Player's health
+	MaxHealth = 100.0f;
+	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts or when spawned
@@ -246,12 +252,12 @@ void AFPSCharacter::Reload()
 
 void AFPSCharacter::DamageMe(int damage)
 {
-	if (Health > 0) {
-		Health -= damage;
+	if (CurrentHealth > 0) {
+		CurrentHealth -= damage;
 	}
-	if (Health > 100)
-		Health = 100;
-	if (Health <= 0) {
+	if (CurrentHealth > 100)
+		CurrentHealth = 100;
+	if (CurrentHealth <= 0) {
 		bAlive = false;
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Im dead"));
 		MyInventory->DestroyItems();
@@ -261,6 +267,65 @@ void AFPSCharacter::DamageMe(int damage)
 }
 
 int AFPSCharacter::GetHealth() {
-	return this->Health;
+	return this->CurrentHealth;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Replicated Properties
+
+void AFPSCharacter::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//Replicate current health.
+	DOREPLIFETIME(AThirdPersonMPCharacter, CurrentHealth);
+}
+
+void AFPSCharacter::OnHealthUpdate()
+{
+	//Client-specific functionality
+	if (IsLocallyControlled())
+	{
+		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
+
+		if (CurrentHealth <= 0)
+		{
+			FString deathMessage = FString::Printf(TEXT("You have been killed."));
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, deathMessage);
+		}
+	}
+
+	//Server-specific functionality
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
+	}
+
+	//Functions that occur on all machines. 
+	/*
+		Any special functionality that should occur as a result of damage or death should be placed here.
+	*/
+}
+
+void AFPSCharacter::OnRep_CurrentHealth()
+{
+	OnHealthUpdate();
+}
+
+void AThirdPersonMPCharacter::SetCurrentHealth(float healthValue)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
+		OnHealthUpdate();
+	}
+}
+
+float AThirdPersonMPCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth(damageApplied);
+	return damageApplied;
+}

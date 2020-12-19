@@ -3,6 +3,7 @@
 
 #include "Weapon.h"
 
+
 AWeapon::AWeapon()
 {
 
@@ -44,7 +45,7 @@ void AWeapon::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation,
 		AmmunitionMagazine--;
 	}
 }
-void AWeapon::Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {
+void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {
 	if (ProjectileClass) {
 		UWorld* World = GetWorld();
 		if (World)
