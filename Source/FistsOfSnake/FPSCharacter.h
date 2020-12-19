@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 	float MaxHealth;
 
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth)
 	float CurrentHealth;
 
 	UFUNCTION()
@@ -75,7 +75,7 @@ public:
 	void MoveRight(float Value);
 
 	// Function that handles firing projectiles.
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void UseItem();
 
 	// Gun muzzle offset from the camera location.
@@ -103,12 +103,16 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AFPSProjectile> ProjectileClass;
+
+
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *WeaponMesh;
 	
 	UFUNCTION()
-	int GetHealth();
+	float GetHealth();
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;

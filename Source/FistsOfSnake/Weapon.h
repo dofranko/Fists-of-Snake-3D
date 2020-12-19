@@ -43,10 +43,11 @@ public:
 
 	bool bReloading;
 
-	UFUNCTION(Server, Reliable)
-	void Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+	
+	
+	void Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation);
 
-	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams);
 
 	void StartReloading();
 

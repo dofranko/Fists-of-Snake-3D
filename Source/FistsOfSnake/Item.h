@@ -61,7 +61,7 @@ public:
 	void ThrowMe(AFPSCharacter* Player);
 
 	// Activate an item
-	virtual void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+	virtual void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams);
 
 	// Reload a weapon
 	virtual void Reload();

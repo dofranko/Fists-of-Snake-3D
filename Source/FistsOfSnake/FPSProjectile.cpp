@@ -29,16 +29,3 @@ AFPSProjectile::AFPSProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 }
 
-// Function that is called when the projectile hits something.
-void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-{
-	AFPSCharacter* Enemy = Cast<AFPSCharacter>(OtherActor);
-	if (Enemy) {
-		if (OtherActor != this && OtherComponent->IsSimulatingPhysics())
-		{
-			OtherComponent->AddImpulseAtLocation(ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint);
-		}
-		Enemy->DamageMe(this->Damage);
-		Destroy();
-	}
-}

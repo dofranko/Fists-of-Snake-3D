@@ -26,10 +26,11 @@ AWeapon::AWeapon()
 	AmmunitionTotal = AmmunitionMax;
 	AmmunitionMagazine = AmmunitionMagazineMax;
 	bReloading = false;
+	bReplicates = true;
 }
 
 
-void AWeapon::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {
+void AWeapon::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams) {
 	check(GEngine != nullptr);
 	if (bReloading) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Reloading"));
@@ -41,11 +42,11 @@ void AWeapon::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation,
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Need to reload"));
 	}
 	else {
-		this->Fire(MuzzleLocation, MuzzleRotation, SpawnParams);
+		this->Fire(MuzzleLocation, MuzzleRotation);
 		AmmunitionMagazine--;
 	}
 }
-void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {
+void AWeapon::Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
 	if (ProjectileClass) {
 		UWorld* World = GetWorld();
 		if (World)
@@ -53,7 +54,10 @@ void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator&
 			check(GEngine != nullptr);
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Shooting"));
 			// Spawn the projectile at the muzzle.
-			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			FActorSpawnParameters spawnParameters;
+			
+			spawnParameters.Owner = this;
+			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (Projectile)
 			{
 				// Set the projectile's initial trajectory.

@@ -97,7 +97,7 @@ void AFPSCharacter::BeginPlay()
 		this->EquippedItemIndex = 0;
 		this->MyInventory->AddItem(this->EquippedItem);
 	}
-	Health = 100;
+
 	bAlive = true;
 }
 
@@ -160,12 +160,26 @@ void AFPSCharacter::MoveRight(float Value)
 	AddMovementInput(Direction, Value);
 }
 
-void AFPSCharacter::UseItem()
+void AFPSCharacter::UseItem_Implementation()
 {
 	check(GEngine != nullptr);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Using Item"));
 	// Attempt to fire a projectile.
-	if (EquippedItem)
+	if (ProjectileClass) {
+		FVector muzzleLocation = this->FPSCameraComponent->GetComponentLocation();
+		FRotator muzzleRotation = this->FPSCameraComponent->GetComponentRotation();
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.Owner = this;
+		
+		this->EquippedItem->Use(muzzleLocation, muzzleRotation, spawnParameters);
+		if (!this->EquippedItem->bAlive)
+		{
+			this->MyInventory->RemoveItem(this->EquippedItemIndex);
+			this->EquippedItem = nullptr;
+			this->EquippedItemIndex = -1;
+		}
+	}
+	if (false)
 	{
 		// Get the camera transform.
 		FVector CameraLocation;
@@ -266,7 +280,7 @@ void AFPSCharacter::DamageMe(int damage)
 	}
 }
 
-int AFPSCharacter::GetHealth() {
+float AFPSCharacter::GetHealth() {
 	return this->CurrentHealth;
 }
 
@@ -278,7 +292,7 @@ void AFPSCharacter::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	//Replicate current health.
-	DOREPLIFETIME(AThirdPersonMPCharacter, CurrentHealth);
+	DOREPLIFETIME(AFPSCharacter, CurrentHealth);
 }
 
 void AFPSCharacter::OnHealthUpdate()
@@ -314,7 +328,7 @@ void AFPSCharacter::OnRep_CurrentHealth()
 	OnHealthUpdate();
 }
 
-void AThirdPersonMPCharacter::SetCurrentHealth(float healthValue)
+void AFPSCharacter::SetCurrentHealth(float healthValue)
 {
 	if (GetLocalRole() == ROLE_Authority)
 	{
@@ -323,7 +337,7 @@ void AThirdPersonMPCharacter::SetCurrentHealth(float healthValue)
 	}
 }
 
-float AThirdPersonMPCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AFPSCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float damageApplied = CurrentHealth - DamageTaken;
 	SetCurrentHealth(damageApplied);

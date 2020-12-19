@@ -13,7 +13,7 @@ AGrenade::AGrenade()
 	this->NumberOfGrenades = 10;
 }
 
-void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams)
+void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams)
 {
 	check(GEngine != nullptr);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Throwing a grenade"));
@@ -26,7 +26,7 @@ void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation
 	}	
 }
 
-void AGrenade::ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams)
+void AGrenade::ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams)
 {
 	if (ProjectileGrenadeClass) {
 		UWorld* World = GetWorld();

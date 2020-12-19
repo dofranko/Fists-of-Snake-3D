@@ -88,6 +88,6 @@ void AItem::ThrowMe(AFPSCharacter* Player)
 	HideOrExposeMe(false);
 }
 
-void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {}
+void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams) {}
 
 void AItem::Reload() {}

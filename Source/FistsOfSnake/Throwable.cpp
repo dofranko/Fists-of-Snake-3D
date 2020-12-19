@@ -59,11 +59,11 @@ AThrowable::AThrowable()
 	InitialLifeSpan = 5.0f;
 
 	bReplicates = true;
-
+	SetReplicateMovement(true);
 	//Registering the Projectile Impact function on a Hit event.
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		SphereComponent->OnComponentHit.AddDynamic(this, &AThrowable::OnProjectileImpact);
+		CollisionComponent->OnComponentHit.AddDynamic(this, &AThrowable::OnProjectileImpact);
 	}
 }
 
@@ -102,7 +102,7 @@ void AThrowable::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* O
 {
 	if (OtherActor)
 	{
-		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, Instigator->Controller, this, DamageType);
+		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, NULL, this, DamageType);
 	}
 
 	Destroy();
