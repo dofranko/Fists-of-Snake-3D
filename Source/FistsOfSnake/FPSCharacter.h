@@ -96,8 +96,14 @@ public:
 	void PlayerJump();
 
 	//Tries to Reload weapon
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void Reload();
+
+	UFUNCTION(Server, Reliable)
+	void SpawnFirstWeapon();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnFirstWeapon1();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -107,8 +113,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AFPSProjectile> ProjectileClass;
 
 
 	// First-person mesh (arms), visible only to the owning player.

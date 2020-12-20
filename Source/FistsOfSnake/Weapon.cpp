@@ -27,6 +27,7 @@ AWeapon::AWeapon()
 	CurrentAmmunitionMagazine = MaxAmmunitionMagazine;
 	bReloading = false;
 	bReplicates = true;
+	SetReplicateMovement( true);
 }
 
 
@@ -54,6 +55,7 @@ void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator&
 			// Spawn the projectile at the muzzle.
 			FActorSpawnParameters spawnParameters;
 			
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("Shooting. I 1 Have %d ammo"), CurrentAmmunitionMagazine));
 			spawnParameters.Owner = this;
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (Projectile)
@@ -64,7 +66,6 @@ void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator&
 			}
 		}
 		CurrentAmmunitionMagazine--;
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("Shooting. I Have %d ammo"), CurrentAmmunitionMagazine));
 	}
 }
 
@@ -83,8 +84,10 @@ void AWeapon::Reload_Implementation() {
 
 void AWeapon::StartReloading() {
 	
+	if (!bReloading) {
 		bReloading = true;
-		GetWorld()->GetTimerManager().SetTimer(_reloadTimerHandler, this, &AWeapon::Reload, ReloadTime, false);
+		GetWorld()->GetTimerManager().SetTimer(_reloadTimerHandler, this, &AWeapon::StopReloading, ReloadTime, false);
+	}
 	
 }
 

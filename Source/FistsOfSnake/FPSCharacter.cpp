@@ -51,6 +51,7 @@ AFPSCharacter::AFPSCharacter()
 	// Player's health
 	MaxHealth = 100.0f;
 	CurrentHealth = MaxHealth;
+	
 }
 
 // Called when the game starts or when spawned
@@ -77,30 +78,52 @@ void AFPSCharacter::BeginPlay()
 				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
 			}
 		}
-
-		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
-		TArray<UObject *> Array;
-		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
-		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
-		FVector SpawnLocation = this->GetActorLocation() + FVector(-120.0f, -30.0f, 85.0f);
-		FRotator Rotation = this->GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f);
-		this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
-		this->EquippedItem->SetActorTickEnabled(false);
-		this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
-		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
-		this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
-		this->EquippedItem->ItemName = FString(TEXT("AR4"));
-		TArray<UObject*> Array2;
-		EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons") , Array2, EngineUtils::ATL_Regular);
-		UTexture2D* texture = Cast<UTexture2D>(Array2[2]);
-		this->EquippedItem->ItemIcon = texture;
-		this->EquippedItemIndex = 0;
-		this->MyInventory->AddItem(this->EquippedItem);
+		
 	}
-
+	
 	bAlive = true;
 }
 
+void AFPSCharacter::SpawnFirstWeapon_Implementation() {
+	UWorld* World = GetWorld();
+	const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+	TArray<UObject*> Array;
+	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
+	USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
+	FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, 0, 85.0f);
+	FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
+	this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
+	this->EquippedItem->SetActorTickEnabled(false);
+	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
+	this->EquippedItem->ItemName = FString(TEXT("AR4"));
+	TArray<UObject*> Array2;
+	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons"), Array2, EngineUtils::ATL_Regular);
+	UTexture2D* texture = Cast<UTexture2D>(Array2[2]);
+	this->EquippedItem->ItemIcon = texture;
+	this->EquippedItemIndex = 0;
+	this->MyInventory->AddItem(this->EquippedItem);
+	SpawnFirstWeapon1();
+}
+
+void AFPSCharacter::SpawnFirstWeapon1_Implementation() {
+	if (!EquippedItem) {
+		FString healthMessage = FString::Printf(TEXT("%s creates!"), *GetFName().ToString());
+		FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, 0, 85.0f);
+		FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
+		this->EquippedItem = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
+	}
+	if (true) {
+		UWorld* World = GetWorld();
+		const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+		TArray<UObject*> Array;
+		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
+		USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
+		this->EquippedItem->SetActorTickEnabled(false);
+		this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
+		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
+		this->EquippedItem->SkeletalMesh->SetIsReplicated(true);
+	}
+}
 // Called every frame
 void AFPSCharacter::Tick(float DeltaTime)
 {
@@ -162,24 +185,24 @@ void AFPSCharacter::MoveRight(float Value)
 
 void AFPSCharacter::UseItem_Implementation()
 {
+	if(!EquippedItem)
+		SpawnFirstWeapon();
 	check(GEngine != nullptr);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Using Item"));
 	// Attempt to fire a projectile.
-	if (ProjectileClass) {
-		FVector muzzleLocation = this->FPSCameraComponent->GetComponentLocation();
-		FRotator muzzleRotation = this->FPSCameraComponent->GetComponentRotation();
-		FActorSpawnParameters spawnParameters;
-		spawnParameters.Owner = this;
-		
-		this->EquippedItem->Use(muzzleLocation, muzzleRotation);
-		if (!this->EquippedItem->bAlive)
-		{
-			this->MyInventory->RemoveItem(this->EquippedItemIndex);
-			this->EquippedItem = nullptr;
-			this->EquippedItemIndex = -1;
-		}
+
+	FVector muzzleLocation = this->FPSCameraComponent->GetComponentLocation();
+	FRotator muzzleRotation = this->FPSCameraComponent->GetComponentRotation();
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Owner = this;
+
+	this->EquippedItem->Use(muzzleLocation, muzzleRotation);
+	if (!this->EquippedItem->bAlive)
+	{
+		this->MyInventory->RemoveItem(this->EquippedItemIndex);
+		this->EquippedItem = nullptr;
+		this->EquippedItemIndex = -1;
 	}
-	
 }
 
 void AFPSCharacter::PlayerJump()
@@ -233,7 +256,7 @@ void AFPSCharacter::ChooseItem(int Index)
 	}
 }
 
-void AFPSCharacter::Reload()
+void AFPSCharacter::Reload_Implementation()
 {
 	if (EquippedItem) {
 		AWeapon* weapon = Cast<AWeapon>(this->EquippedItem);
