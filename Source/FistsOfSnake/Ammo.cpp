@@ -17,30 +17,30 @@ void AAmmo::PickUp(AFPSCharacter* Player)
 	AWeapon* PlayerWeapon = Cast<AWeapon>(Player->EquippedItem);
 	if (PlayerWeapon)
 	{
-		if (PlayerWeapon->AmmunitionMagazine == PlayerWeapon->AmmunitionMagazineMax && PlayerWeapon->AmmunitionMax == PlayerWeapon->AmmunitionTotal)
+		if (PlayerWeapon->GetCurrentAmmunitionMagazine() == PlayerWeapon->GetMaxAmmunitionMagazine() && PlayerWeapon->GetMaxAmmunitionTotal() == PlayerWeapon->GetCurrentAmmunitionTotal())
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Your weapon is full of ammo"));
 			return;
 		}
 
-		if (this->Ammunition <= PlayerWeapon->AmmunitionMagazineMax - PlayerWeapon->AmmunitionMagazine)
+		if (this->Ammunition <= PlayerWeapon->GetMaxAmmunitionMagazine() - PlayerWeapon->GetCurrentAmmunitionMagazine())
 		{
-			PlayerWeapon->AmmunitionMagazine += this->Ammunition;
+			PlayerWeapon->SetCurrentAmmunitionMagazine(PlayerWeapon->GetCurrentAmmunitionMagazine() + this->Ammunition);
 			this->Ammunition = 0;
 		}
 		else
 		{
-			this->Ammunition -= PlayerWeapon->AmmunitionMagazineMax - PlayerWeapon->AmmunitionMagazine;
-			PlayerWeapon->AmmunitionMagazine = PlayerWeapon->AmmunitionMagazineMax;
+			this->Ammunition -= PlayerWeapon->GetMaxAmmunitionMagazine() - PlayerWeapon->GetCurrentAmmunitionMagazine();
+			PlayerWeapon->SetCurrentAmmunitionMagazine(PlayerWeapon->GetMaxAmmunitionMagazine());
 		}
 
-		if (this->Ammunition < PlayerWeapon->AmmunitionMax - PlayerWeapon->AmmunitionTotal)
+		if (this->Ammunition < PlayerWeapon->GetMaxAmmunitionTotal() - PlayerWeapon->GetCurrentAmmunitionTotal())
 		{
-			PlayerWeapon->AmmunitionTotal += this->Ammunition;
+			PlayerWeapon->SetCurrentAmmunitionTotal(PlayerWeapon->GetCurrentAmmunitionTotal() + this->Ammunition);
 		}
 		else
 		{
-			PlayerWeapon->AmmunitionTotal = PlayerWeapon->AmmunitionMax;
+			PlayerWeapon->SetCurrentAmmunitionTotal(PlayerWeapon->GetMaxAmmunitionTotal());
 		}
 
 		Destroy();

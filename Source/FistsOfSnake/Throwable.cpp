@@ -50,12 +50,21 @@ AThrowable::AThrowable()
 	ProjectileMovementComponent->MaxSpeed = 3000.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 
+	DamageType = UDamageType::StaticClass();
+
 	if (!Damage)
-		Damage = 11;
+		Damage = 11.f;
 
 	// Delete the projectile after 5 seconds.
 	InitialLifeSpan = 5.0f;
 
+	bReplicates = true;
+	SetReplicateMovement(true);
+	//Registering the Projectile Impact function on a Hit event.
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CollisionComponent->OnComponentHit.AddDynamic(this, &AThrowable::OnProjectileImpact);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -81,4 +90,20 @@ void AThrowable::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 void AThrowable::FireInDirection(const FVector& ShootDirection)
 {
 	ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
+}
+
+void AThrowable::Destroyed()
+{
+	FVector spawnLocation = GetActorLocation();
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, spawnLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+}
+
+void AThrowable::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor)
+	{
+		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, NormalImpulse, Hit, NULL, this, DamageType);
+	}
+
+	Destroy();
 }

@@ -26,9 +26,40 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	int Health;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Health")
+	float MaxHealth;
+
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth)
+	float CurrentHealth;
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+
+	/** Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify*/
+	void OnHealthUpdate();
 
 public:
+
+	/** Property replication */
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/** Getter for Max Health.*/
+	UFUNCTION(BlueprintPure, Category = "Health")
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
+	/** Getter for Current Health.*/
+	UFUNCTION(BlueprintPure, Category = "Health")
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+
+	/** Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.*/
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void SetCurrentHealth(float healthValue);
+
+	/** Event for taking damage. Overridden from APawn.*/
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -44,7 +75,7 @@ public:
 	void MoveRight(float Value);
 
 	// Function that handles firing projectiles.
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void UseItem();
 
 	// Gun muzzle offset from the camera location.
@@ -52,8 +83,12 @@ public:
 	FVector MuzzleOffset;
 
 	// Actualy used item in hands
-	UPROPERTY(EditDefaultsOnly, Category = Item)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth, EditDefaultsOnly, Category = Item)
 	AItem *EquippedItem;
+
+	UFUNCTION(BlueprintPure, Category=Weapon)
+	AItem* GetEquippedItem();
+
 	int EquippedItemIndex = -1;
 
 	// Change jump flag when key is pressed.
@@ -61,8 +96,14 @@ public:
 	void PlayerJump();
 
 	//Tries to Reload weapon
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void Reload();
+
+	UFUNCTION(Server, Reliable)
+	void SpawnFirstWeapon();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnFirstWeapon1();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -72,12 +113,14 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
+
+
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *WeaponMesh;
 	
 	UFUNCTION()
-	int GetHealth();
+	float GetHealth();
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;

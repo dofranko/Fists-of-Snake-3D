@@ -13,6 +13,8 @@ AItem::AItem()
 	this->RotationRate = FRotator(0.0f, 180.0f, 0.0f);
 	this->RotationSpeed = 1.0f;
 	this->SetActorEnableCollision(false);
+	
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -88,6 +90,6 @@ void AItem::ThrowMe(AFPSCharacter* Player)
 	HideOrExposeMe(false);
 }
 
-void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams) {}
+void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {}
 
 void AItem::Reload() {}

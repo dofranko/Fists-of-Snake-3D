@@ -22,7 +22,7 @@ void AFPSHUD::DrawHUD()
         TileItem.BlendMode = SE_BLEND_Translucent;
         Canvas->DrawItem(TileItem);
     }
-    ACharacter *mainPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    APawn *mainPlayer = GetOwningPawn();
     if (mainPlayer)
     {
         AFPSCharacter *mainFpsPlayer = Cast<AFPSCharacter>(mainPlayer);
@@ -31,16 +31,14 @@ void AFPSHUD::DrawHUD()
             AWeapon *playerWeapon = Cast<AWeapon>(mainFpsPlayer->EquippedItem);
             if (playerWeapon)
             {
-                int AmmunitionTotal = playerWeapon->AmmunitionTotal;
-                DrawText(FString::FromInt(AmmunitionTotal), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-                int AmmunitionMagazine = playerWeapon->AmmunitionMagazine;
-                DrawText(FString::FromInt(AmmunitionMagazine), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionTotal()), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionMagazine()), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
             }
 
-            int playerHealth = mainFpsPlayer->GetHealth();
+            float playerHealth = mainFpsPlayer->GetCurrentHealth();
             if (playerHealth)
             {
-                DrawText(FString::FromInt(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
+                DrawText(FString::SanitizeFloat(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
             }
 
             AGrenade *PlayerGrenade = Cast<AGrenade>(mainFpsPlayer->EquippedItem);

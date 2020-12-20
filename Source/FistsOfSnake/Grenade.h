@@ -26,8 +26,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	int NumberOfGrenades;
 
-	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+	void Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation);
 
-	void ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, FActorSpawnParameters SpawnParams);
+	void ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation);
 
 };
