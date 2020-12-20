@@ -83,8 +83,12 @@ public:
 	FVector MuzzleOffset;
 
 	// Actualy used item in hands
-	UPROPERTY(EditDefaultsOnly, Category = Item)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth, EditDefaultsOnly, Category = Item)
 	AItem *EquippedItem;
+
+	UFUNCTION(BlueprintPure, Category=Weapon)
+	AItem* GetEquippedItem();
+
 	int EquippedItemIndex = -1;
 
 	// Change jump flag when key is pressed.

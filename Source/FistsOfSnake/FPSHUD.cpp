@@ -31,10 +31,8 @@ void AFPSHUD::DrawHUD()
             AWeapon *playerWeapon = Cast<AWeapon>(mainFpsPlayer->EquippedItem);
             if (playerWeapon)
             {
-                int AmmunitionTotal = playerWeapon->AmmunitionTotal;
-                DrawText(FString::FromInt(AmmunitionTotal), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-                int AmmunitionMagazine = playerWeapon->AmmunitionMagazine;
-                DrawText(FString::FromInt(AmmunitionMagazine), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
+                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionTotal()), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
+                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionMagazine()), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
             }
 
             float playerHealth = mainFpsPlayer->GetCurrentHealth();

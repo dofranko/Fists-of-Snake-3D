@@ -171,7 +171,7 @@ void AFPSCharacter::UseItem_Implementation()
 		FActorSpawnParameters spawnParameters;
 		spawnParameters.Owner = this;
 		
-		this->EquippedItem->Use(muzzleLocation, muzzleRotation, spawnParameters);
+		this->EquippedItem->Use(muzzleLocation, muzzleRotation);
 		if (!this->EquippedItem->bAlive)
 		{
 			this->MyInventory->RemoveItem(this->EquippedItemIndex);
@@ -179,33 +179,7 @@ void AFPSCharacter::UseItem_Implementation()
 			this->EquippedItemIndex = -1;
 		}
 	}
-	if (false)
-	{
-		// Get the camera transform.
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
-
-		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		MuzzleOffset.Set(120.0f, 0.0f, 0.0f);
-
-		// Transform MuzzleOffset from camera space to world space.
-		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
-
-		// Skew the aim to be slightly upwards.
-		FRotator MuzzleRotation = CameraRotation;
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = GetInstigator();
-		this->EquippedItem->Use(MuzzleLocation, MuzzleRotation, SpawnParams);
-		if (!this->EquippedItem->bAlive)
-		{
-			this->MyInventory->RemoveItem(this->EquippedItemIndex);
-			this->EquippedItem = nullptr;
-			this->EquippedItemIndex = -1;
-		}
-	}
+	
 }
 
 void AFPSCharacter::PlayerJump()
@@ -261,23 +235,16 @@ void AFPSCharacter::ChooseItem(int Index)
 
 void AFPSCharacter::Reload()
 {
-	this->EquippedItem->Reload();
+	if (EquippedItem) {
+		AWeapon* weapon = Cast<AWeapon>(this->EquippedItem);
+		if (weapon)
+			weapon->StartReloading();
+	}
 }
 
 void AFPSCharacter::DamageMe(int damage)
 {
-	if (CurrentHealth > 0) {
-		CurrentHealth -= damage;
-	}
-	if (CurrentHealth > 100)
-		CurrentHealth = 100;
-	if (CurrentHealth <= 0) {
-		bAlive = false;
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Im dead"));
-		MyInventory->DestroyItems();
-		Destroy();
-
-	}
+	
 }
 
 float AFPSCharacter::GetHealth() {
@@ -293,6 +260,7 @@ void AFPSCharacter::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLi
 
 	//Replicate current health.
 	DOREPLIFETIME(AFPSCharacter, CurrentHealth);
+	DOREPLIFETIME(AFPSCharacter, EquippedItem);
 }
 
 void AFPSCharacter::OnHealthUpdate()
@@ -342,4 +310,8 @@ float AFPSCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& Da
 	float damageApplied = CurrentHealth - DamageTaken;
 	SetCurrentHealth(damageApplied);
 	return damageApplied;
+}
+
+AItem* AFPSCharacter::GetEquippedItem() {
+	return this->EquippedItem;
 }
