@@ -13,11 +13,11 @@ AGrenade::AGrenade()
 	this->NumberOfGrenades = 10;
 }
 
-void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams)
+void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation)
 {
 	check(GEngine != nullptr);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Throwing a grenade"));
-	this->ThrowGrenade(MuzzleLocation, MuzzleRotation, SpawnParams);
+	this->ThrowGrenade(MuzzleLocation, MuzzleRotation);
 	this->NumberOfGrenades -= 1;
 	if (this->NumberOfGrenades == 0)
 	{
@@ -26,14 +26,17 @@ void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation
 	}	
 }
 
-void AGrenade::ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams)
+void AGrenade::ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation)
 {
 	if (ProjectileGrenadeClass) {
 		UWorld* World = GetWorld();
 		if (World)
 		{
+			FActorSpawnParameters spawnParameters;
+
+			spawnParameters.Owner = this;
 			// Spawn the projectile at the muzzle.
-			AFPSProjectileGrenade *ProjectileGrenade = World->SpawnActor<AFPSProjectileGrenade>(ProjectileGrenadeClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			AFPSProjectileGrenade *ProjectileGrenade = World->SpawnActor<AFPSProjectileGrenade>(ProjectileGrenadeClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (ProjectileGrenade)
 			{
 				// Set the projectile's initial trajectory.

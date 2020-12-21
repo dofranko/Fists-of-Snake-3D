@@ -14,48 +14,48 @@ AWeapon::AWeapon()
 		ProjectileClass = AFPSProjectile::StaticClass();
 	}
 
-	if (!AmmunitionMax || AmmunitionMax <= 0) {
-		AmmunitionMax = 120;
+	if (!MaxAmmunitionTotal || MaxAmmunitionTotal <= 0) {
+		MaxAmmunitionTotal = 120;
 	}
-	if (!AmmunitionMagazineMax || AmmunitionMagazineMax <= 0) {
-		AmmunitionMagazineMax = 30;
+	if (!MaxAmmunitionMagazine || MaxAmmunitionMagazine <= 0) {
+		MaxAmmunitionMagazine = 30;
 	}
 	if (!ReloadTime || ReloadTime <= 0) {
 		ReloadTime = 3.f;
 	}
-	AmmunitionTotal = AmmunitionMax;
-	AmmunitionMagazine = AmmunitionMagazineMax;
+	CurrentAmmunitionTotal = MaxAmmunitionTotal;
+	CurrentAmmunitionMagazine = MaxAmmunitionMagazine;
 	bReloading = false;
 	bReplicates = true;
+	SetReplicateMovement( true);
 }
 
 
-void AWeapon::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation, const FActorSpawnParameters& SpawnParams) {
+void AWeapon::Use_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
 	check(GEngine != nullptr);
 	if (bReloading) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Reloading"));
 	}
-	else if (AmmunitionMagazine <= 0 && AmmunitionTotal <= 0) {
+	else if (CurrentAmmunitionMagazine <= 0 && CurrentAmmunitionTotal <= 0) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("No ammo"));
 	}
-	else if (AmmunitionMagazine <= 0) {
+	else if (CurrentAmmunitionMagazine <= 0) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Need to reload"));
 	}
 	else {
 		this->Fire(MuzzleLocation, MuzzleRotation);
-		AmmunitionMagazine--;
 	}
 }
-void AWeapon::Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
+void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
 	if (ProjectileClass) {
 		UWorld* World = GetWorld();
 		if (World)
 		{
 			check(GEngine != nullptr);
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Shooting"));
 			// Spawn the projectile at the muzzle.
 			FActorSpawnParameters spawnParameters;
 			
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("Shooting. I 1 Have %d ammo"), CurrentAmmunitionMagazine));
 			spawnParameters.Owner = this;
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (Projectile)
@@ -65,31 +65,66 @@ void AWeapon::Fire(const FVector& MuzzleLocation, const FRotator& MuzzleRotation
 				Projectile->FireInDirection(LaunchDirection);
 			}
 		}
+		CurrentAmmunitionMagazine--;
 	}
 }
 
-void AWeapon::Reload() {
-	if (!bReloading && AmmunitionMagazine < AmmunitionMagazineMax && AmmunitionTotal > 0) {
-		StartReloading();
+void AWeapon::Reload_Implementation() {
+	int toReload = MaxAmmunitionMagazine - CurrentAmmunitionMagazine;
+	if (CurrentAmmunitionTotal >= toReload) {
+		CurrentAmmunitionTotal -= toReload;
+		CurrentAmmunitionMagazine += toReload;
+	}
+	else {
+		toReload = CurrentAmmunitionTotal;
+		CurrentAmmunitionTotal -= toReload;
+		CurrentAmmunitionMagazine += toReload;
 	}
 }
 
 void AWeapon::StartReloading() {
-	bReloading = true;
-	GetWorld()->GetTimerManager().SetTimer(_reloadTimerHandler, this, &AWeapon::StopReloading, ReloadTime, false);
+	
+	if (!bReloading) {
+		bReloading = true;
+		GetWorld()->GetTimerManager().SetTimer(_reloadTimerHandler, this, &AWeapon::StopReloading, ReloadTime, false);
+	}
+	
 }
 
 void AWeapon::StopReloading() {
 	bReloading = false;
-	int toReload = AmmunitionMagazineMax - AmmunitionMagazine;
-	if (AmmunitionTotal >= toReload) {
-		AmmunitionTotal -= toReload;
-		AmmunitionMagazine += toReload;
-	}
-	else {
-		toReload = AmmunitionTotal;
-		AmmunitionTotal -= toReload;
-		AmmunitionMagazine += toReload;
+	Reload();
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Replicated Properties
+
+void AWeapon::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//Replicate current health.
+	DOREPLIFETIME(AWeapon, CurrentAmmunitionMagazine); 
+	DOREPLIFETIME(AWeapon, CurrentAmmunitionTotal);
+}
+
+void AWeapon::SetCurrentAmmunitionMagazine(int ammo) {
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentAmmunitionMagazine = ammo;
+
 	}
 }
 
+void AWeapon::SetCurrentAmmunitionTotal(int ammo) {
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentAmmunitionTotal = ammo;
+	}
+}
+void AWeapon::OnRep_CurrentAmmunitionTotal() {
+
+}
+void AWeapon::OnRep_CurrentAmmunitionMagazine() {
+
+}

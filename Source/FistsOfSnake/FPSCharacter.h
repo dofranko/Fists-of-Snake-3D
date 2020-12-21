@@ -83,8 +83,12 @@ public:
 	FVector MuzzleOffset;
 
 	// Actualy used item in hands
-	UPROPERTY(EditDefaultsOnly, Category = Item)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth, EditDefaultsOnly, Category = Item)
 	AItem *EquippedItem;
+
+	UFUNCTION(BlueprintPure, Category=Weapon)
+	AItem* GetEquippedItem();
+
 	int EquippedItemIndex = -1;
 
 	// Change jump flag when key is pressed.
@@ -92,8 +96,14 @@ public:
 	void PlayerJump();
 
 	//Tries to Reload weapon
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void Reload();
+
+	UFUNCTION(Server, Reliable)
+	void SpawnFirstWeapon();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnFirstWeapon1();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -103,8 +113,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AFPSProjectile> ProjectileClass;
 
 
 	// First-person mesh (arms), visible only to the owning player.
