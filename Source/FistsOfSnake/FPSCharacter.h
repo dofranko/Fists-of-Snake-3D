@@ -66,6 +66,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
+	UWorld* World;
+
 	// Handles input for moving forward and backward.
 	UFUNCTION()
 	void MoveForward(float Value);
@@ -124,6 +126,8 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;
+
+	void Initialize();
 
 	void SetWantToPickUp();
 

@@ -63,13 +63,17 @@ void AFPSCharacter::BeginPlay()
 	// Display a debug message for five seconds.
 	// The -1 "Key" value argument prevents the message from being updated or refreshed.
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
+	this->World = GetWorld();
+	Initialize();
+}
 
-	// Create an elementery weapon for player
-	UWorld *World = GetWorld();
+void AFPSCharacter::Initialize()
+{
+// Create an elementery weapon for player
 	if (World)
 	{
 		// Iterate through player's CameraManager (multiplayer)
-		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter) 
+		for (FConstPlayerControllerIterator Iter = World->GetPlayerControllerIterator(); Iter; ++Iter) 
 		{
 			APlayerController* PlayerController = Iter->Get();
 
