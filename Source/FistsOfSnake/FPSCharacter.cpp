@@ -89,7 +89,6 @@ void AFPSCharacter::Initialize()
 }
 
 void AFPSCharacter::SpawnFirstWeapon_Implementation() {
-	UWorld* World = GetWorld();
 	const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 	TArray<UObject*> Array;
 	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
@@ -117,7 +116,6 @@ void AFPSCharacter::SpawnFirstWeapon1_Implementation() {
 		this->EquippedItem = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 	}
 	if (true) {
-		UWorld* World = GetWorld();
 		const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 		TArray<UObject*> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);

@@ -29,14 +29,15 @@ void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation
 void AGrenade::ThrowGrenade(const FVector& MuzzleLocation, const FRotator& MuzzleRotation)
 {
 	if (ProjectileGrenadeClass) {
-		UWorld* World = GetWorld();
+		if (!World)
+			World = GetWorld();
 		if (World)
 		{
 			FActorSpawnParameters spawnParameters;
-
 			spawnParameters.Owner = this;
 			// Spawn the projectile at the muzzle.
 			AFPSProjectileGrenade *ProjectileGrenade = World->SpawnActor<AFPSProjectileGrenade>(ProjectileGrenadeClass, MuzzleLocation, MuzzleRotation, spawnParameters);
+			ProjectileGrenade->World = World;
 			if (ProjectileGrenade)
 			{
 				// Set the projectile's initial trajectory.

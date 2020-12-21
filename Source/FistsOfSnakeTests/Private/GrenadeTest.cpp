@@ -41,13 +41,15 @@ bool FGrenadeTest::RunTest(const FString& Parameters)
 
 	{
 		AGrenade* Grenade = World->SpawnActor<AGrenade>(AGrenade::StaticClass(), FVector(-180.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
+		AFPSCharacter* Player = World->SpawnActor<AFPSCharacter>(AFPSCharacter::StaticClass(), FVector(-170.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
+		Grenade->World = World;
+		Player->World = World;
 		//ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(Player));
 
 		int NumGrenades = Grenade->NumberOfGrenades;
-		FActorSpawnParameters SpawnParams;
 		for (int i = NumGrenades - 1; i >= 0; i--)
 		{
-			Grenade->Use(FVector(-180.f,30.f,120.f), FRotator(0.f, 0.f, 0.f), SpawnParams);
+			Grenade->Use(FVector(-180.f,30.f,120.f), FRotator(0.f, 0.f, 0.f));
 			if (Grenade->NumberOfGrenades != i)
 				AddError(TEXT("Substraction of grenades doesn't work"));
 			

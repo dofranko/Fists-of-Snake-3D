@@ -20,6 +20,8 @@ public:
 
 	AGrenade();
 
+	UWorld* World;
+
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AFPSProjectileGrenade> ProjectileGrenadeClass;
 

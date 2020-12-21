@@ -55,12 +55,12 @@ bool FShiftingItemTest::RunTest(const FString& Parameters)
 
 		if (!Cast<AWeapon>(Player->EquippedItem))
 			AddError(TEXT("At the index 0 should be the weapon"));
-		Player->ThrowItem();
+		//Player->ThrowItem();
 		if (Player->EquippedItem)
 			AddError(TEXT("Player shouldn't have item after throwing it out"));
 		if (Player->MyInventory->GetItem(0))
 			AddError(TEXT("A throwed item shouldn't be in player's inventory"));
-		Player->ChooseItem(0);
+		//Player->ChooseItem(0);
 		if (Player->EquippedItem)
 			AddError(TEXT("The position 0 isn't null"));
 		if(Player->ManagerCamera)

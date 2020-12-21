@@ -37,6 +37,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float Radius = 500.f;
 
+	UWorld* World;
+
 	UFUNCTION()
 	void OnDetonate();
 

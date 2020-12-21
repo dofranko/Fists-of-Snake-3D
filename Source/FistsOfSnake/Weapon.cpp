@@ -48,7 +48,6 @@ void AWeapon::Use_Implementation(const FVector& MuzzleLocation, const FRotator& 
 }
 void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
 	if (ProjectileClass) {
-		UWorld* World = GetWorld();
 		if (World)
 		{
 			check(GEngine != nullptr);

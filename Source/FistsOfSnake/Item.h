@@ -41,6 +41,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Icon)
 		UTexture2D* ItemIcon;
+
+	UWorld* World;
 	
 	// Array of players
 	TArray<AFPSCharacter*> Players;

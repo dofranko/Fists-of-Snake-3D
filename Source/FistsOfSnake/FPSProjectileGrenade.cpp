@@ -39,7 +39,7 @@ void AFPSProjectileGrenade::BeginPlay()
 
 	// Time to explode after hitting
 	FTimerHandle handle;
-	UWorld* World = GetWorld();
+	World = GetWorld();
 	if (World)
 		World->GetTimerManager().SetTimer(handle, this, &AFPSProjectileGrenade::OnDetonate, 5.f, false);
 
@@ -47,10 +47,10 @@ void AFPSProjectileGrenade::BeginPlay()
 
 void AFPSProjectileGrenade::OnDetonate()
 {
-	UParticleSystemComponent *Explosion = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticles, GetActorTransform());
+	UParticleSystemComponent *Explosion = UGameplayStatics::SpawnEmitterAtLocation(World, ExplosionParticles, GetActorTransform());
 	Explosion->SetRelativeScale3D(FVector(4.f));
 
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(World, ExplosionSound, GetActorLocation());
 
 	TArray<FHitResult> OutHits;
 
@@ -65,11 +65,11 @@ void AFPSProjectileGrenade::OnDetonate()
 	// Ignoring hitting myself (FPSProjectileGrenade)
 	FCollisionQueryParams TraceParam(FName(TEXT("TraceParam")), false, this);
 
-	if (GetWorld()->SweepMultiByChannel(OutHits, StartTrace, EndTrace, FQuat::Identity, ECC_Pawn, CollisionShape, TraceParam))
+	if (World->SweepMultiByChannel(OutHits, StartTrace, EndTrace, FQuat::Identity, ECC_Pawn, CollisionShape, TraceParam))
 	{
 		for (auto& hited : OutHits)
 		{
-			// Check if Actor has benn destroyed
+			// Check if Actor has been destroyed
 			if (hited.GetActor())
 			{
 				// Throw away some static mesh
