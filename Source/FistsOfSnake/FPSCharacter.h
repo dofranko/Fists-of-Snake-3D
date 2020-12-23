@@ -125,6 +125,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;
 
+	void Initialize();
+
 	void SetWantToPickUp();
 
 	bool bHasCollisionWithItem = false;

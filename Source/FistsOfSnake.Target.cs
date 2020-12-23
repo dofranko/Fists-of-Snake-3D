@@ -10,5 +10,6 @@ public class FistsOfSnakeTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.AddRange( new string[] { "FistsOfSnake" } );
+		ExtraModuleNames.Add("FistsOfSnakeTests");
 	}
 }

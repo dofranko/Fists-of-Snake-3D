@@ -10,5 +10,6 @@ public class FistsOfSnakeEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.AddRange( new string[] { "FistsOfSnake" } );
+		ExtraModuleNames.Add("FistsOfSnakeTests");
 	}
 }
