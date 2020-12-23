@@ -8,56 +8,54 @@
 #include "FistsOfSnake/FPSCharacter.h"
 #include <Editor/UnrealEd/Public/Editor.h>
 
-/*
-DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(FEngineWaitLatentCommand, AFPSCharacter*, Player);
+#if WITH_DEV_AUTOMATION_TESTS
 
-bool FEngineWaitLatentCommand::Update() 
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(FGrenadeCommand, FAutomationTestBase*, test);
+
+bool FGrenadeCommand::Update()
 {
-	if (Player->GetHealth() == 0) 
-		return false;
-	return true;
-}
-*/
+    if (!GEditor->IsPlayingSessionInEditor())//if not, everything would be made while the map is loading and the PIE is in progress.
+    {
+        return false;
+    }
 
-UWorld* GetTestWorld()
-{
-	const TIndirectArray<FWorldContext>& WorldContexts = GEngine->GetWorldContexts();
-	for (const FWorldContext& Context : WorldContexts) {
-		if (((Context.WorldType == EWorldType::PIE) || (Context.WorldType == EWorldType::Editor))
-			&& (Context.World() != nullptr)) {
-			return Context.World();
-		}
-	}
-	return nullptr;
-}
+    UWorld* testWorld = GEditor->GetPIEWorldContext()->World();
+    
+	AFPSCharacter* Player = testWorld->SpawnActor<AFPSCharacter>(AFPSCharacter::StaticClass(), FVector(-180.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
+	AGrenade* Grenade = testWorld->SpawnActor<AGrenade>(AGrenade::StaticClass(), FVector(-180.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
 
-
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FGrenadeTest, "GrenadeTest", EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
-
-bool FGrenadeTest::RunTest(const FString& Parameters)
-{
-	FAutomationEditorCommonUtils::LoadMap(TEXT("/Game/Maps/FPSMapTest"));
-	UWorld* World = GetTestWorld();
-
+	int NumGrenades = Grenade->NumberOfGrenades;
+	for (int i = NumGrenades - 1; i >= 0; i--)
 	{
-		AGrenade* Grenade = World->SpawnActor<AGrenade>(AGrenade::StaticClass(), FVector(-180.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
-		AFPSCharacter* Player = World->SpawnActor<AFPSCharacter>(AFPSCharacter::StaticClass(), FVector(-170.0f, 30.0f, 120.0f), FRotator(0.f, 0.f, 0.f));
-		Grenade->World = World;
-		Player->World = World;
-		//ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(Player));
-
-		int NumGrenades = Grenade->NumberOfGrenades;
-		for (int i = NumGrenades - 1; i >= 0; i--)
-		{
-			Grenade->Use(FVector(-180.f,30.f,120.f), FRotator(0.f, 0.f, 0.f));
-			if (Grenade->NumberOfGrenades != i)
-				AddError(TEXT("Substraction of grenades doesn't work"));
+		Grenade->Use(FVector(-180.f,30.f,120.f), FRotator(0.f, 0.f, 0.f));
+		if (Grenade->NumberOfGrenades != i)
+			test->AddError(TEXT("Substraction of grenades doesn't work"));
 			
 		}
 		if (Grenade->bAlive)
-			AddError(TEXT("Grenade should disappear"));
-		FAutomationEditorCommonUtils::LoadMap(TEXT("/Game/Maps/MainMenuMAp"));
-	}
+			test->AddError(TEXT("Grenade should disappear"));
 
-	return true;
+    return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FGrenadeTest, "GrenadeTest", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+
+bool FGrenadeTest::RunTest(const FString& Parameters)
+{
+    {
+
+        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/FPSMapTest")));
+
+        ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(true));
+
+        ADD_LATENT_AUTOMATION_COMMAND(FGrenadeCommand(this));
+
+        ADD_LATENT_AUTOMATION_COMMAND(FEndPlayMapCommand);
+
+        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/MainMenuMAp")));
+    }
+
+    return true;
+}
+
+#endif //WITH_DEV_AUTOMATION_TESTS

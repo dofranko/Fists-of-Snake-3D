@@ -63,17 +63,12 @@ void AFPSCharacter::BeginPlay()
 	// Display a debug message for five seconds.
 	// The -1 "Key" value argument prevents the message from being updated or refreshed.
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
-	this->World = GetWorld();
-	Initialize();
-}
 
-void AFPSCharacter::Initialize()
-{
-// Create an elementery weapon for player
-	if (World)
+	UWorld* World = GetWorld();
+	if (World) 
 	{
-		// Iterate through player's CameraManager (multiplayer)
-		for (FConstPlayerControllerIterator Iter = World->GetPlayerControllerIterator(); Iter; ++Iter) 
+	// Iterate through player's CameraManager (multiplayer)
+		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter) 
 		{
 			APlayerController* PlayerController = Iter->Get();
 
@@ -82,13 +77,14 @@ void AFPSCharacter::Initialize()
 				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
 			}
 		}
-		
 	}
 	
 	bAlive = true;
 }
 
+
 void AFPSCharacter::SpawnFirstWeapon_Implementation() {
+	UWorld* World = GetWorld();
 	const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 	TArray<UObject*> Array;
 	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
@@ -116,6 +112,7 @@ void AFPSCharacter::SpawnFirstWeapon1_Implementation() {
 		this->EquippedItem = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 	}
 	if (true) {
+		UWorld* World = GetWorld();
 		const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
 		TArray<UObject*> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
