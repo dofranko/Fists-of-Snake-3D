@@ -71,7 +71,7 @@ void AFPSCharacter::BeginPlay()
 		{
 			APlayerController *PlayerController = Iter->Get();
 
-			if (PlayerController && PlayerController->IsLocalController())
+			if (PlayerController && PlayerController->IsLocalPlayerController())
 			{
 				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
 			}
@@ -100,19 +100,12 @@ void AFPSCharacter::SpawnFirstWeapon_Implementation()
 	this->EquippedItem->ItemIcon = texture;
 	this->EquippedItemIndex = 0;
 	this->MyInventory->AddItem(this->EquippedItem);
-	SpawnFirstWeapon1();
+	OnRep_WeaponSwitch();
 }
 
-void AFPSCharacter::SpawnFirstWeapon1()
+void AFPSCharacter::OnRep_WeaponSwitch()
 {
-	if (!EquippedItem)
-	{
-		FString healthMessage = FString::Printf(TEXT("%s creates!"), *GetFName().ToString());
-		FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, -30.0f, 85.0f);
-		FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
-		this->EquippedItem = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
-	}
-	if (true)
+	if (EquippedItem)
 	{
 		UWorld *World = GetWorld();
 		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
@@ -230,6 +223,11 @@ void AFPSCharacter::ThrowItem()
 
 void AFPSCharacter::ChooseItem(int Index)
 {
+	EquipItem(Index);
+}
+
+void AFPSCharacter::EquipItem_Implementation(int Index)
+{
 	if (Index == this->EquippedItemIndex) // not to change the same item
 		return;
 	if (EquippedItem)
@@ -242,13 +240,11 @@ void AFPSCharacter::ChooseItem(int Index)
 	if (EquippedItem)
 	{
 		this->EquippedItemIndex = Index;
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
-		FVector OffSet;
-		OffSet.Set(120.0f, 30.0f, -30.0f);
-		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
+		FVector CameraLocation = this->FPSCameraComponent->GetComponentLocation();
+		FRotator CameraRotation = this->FPSCameraComponent->GetComponentRotation();
+		FVector OffSet(120.0f, 30.0f, -30.0f);
 		FRotator OffSet2(0.0f, -90.0f, 0.0f);
+		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
 		FQuat Rotation = FTransform(CameraRotation).TransformRotation(OffSet2.Quaternion());
 		this->EquippedItem->SetActorLocation(Location);
 		this->EquippedItem->SetActorRotation(Rotation);

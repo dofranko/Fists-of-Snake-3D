@@ -82,7 +82,7 @@ public:
 	FVector MuzzleOffset;
 
 	// Actualy used item in hands
-	UPROPERTY(ReplicatedUsing = SpawnFirstWeapon1, EditDefaultsOnly, Category = Item)
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSwitch, EditDefaultsOnly, Category = Item)
 	AItem *EquippedItem;
 
 	UFUNCTION(BlueprintPure, Category = Weapon)
@@ -102,7 +102,7 @@ public:
 	void SpawnFirstWeapon();
 
 	UFUNCTION()
-	void SpawnFirstWeapon1();
+	void OnRep_WeaponSwitch();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -130,7 +130,11 @@ public:
 
 	void ThrowItem();
 
+	
 	void ChooseItem(int index);
+
+	UFUNCTION(Server, Reliable)
+	void EquipItem(int index);
 
 	void DamageMe(int damage);
 
