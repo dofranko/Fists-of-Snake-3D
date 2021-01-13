@@ -8,7 +8,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 
-
 // Sets default values
 AFPSCharacter::AFPSCharacter()
 {
@@ -51,7 +50,6 @@ AFPSCharacter::AFPSCharacter()
 	// Player's health
 	MaxHealth = 100.0f;
 	CurrentHealth = MaxHealth;
-	
 }
 
 // Called when the game starts or when spawned
@@ -69,55 +67,51 @@ void AFPSCharacter::BeginPlay()
 	if (World)
 	{
 		// Iterate through player's CameraManager (multiplayer)
-		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter) 
+		for (FConstPlayerControllerIterator Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
 		{
-			APlayerController* PlayerController = Iter->Get();
+			APlayerController *PlayerController = Iter->Get();
 
-			if (PlayerController && PlayerController->IsLocalController())
+			if (PlayerController && PlayerController->IsLocalPlayerController())
 			{
 				this->ManagerCamera = Cast<APlayerCameraManager>(PlayerController->PlayerCameraManager);
 			}
 		}
-		
 	}
-	
+
 	bAlive = true;
 }
 
-void AFPSCharacter::SpawnFirstWeapon_Implementation() {
-	UWorld* World = GetWorld();
-	const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
-	TArray<UObject*> Array;
+void AFPSCharacter::SpawnFirstWeapon_Implementation()
+{
+	UWorld *World = GetWorld();
+	const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+	TArray<UObject *> Array;
 	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
-	USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
-	FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, 0, 85.0f);
+	USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
+	FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, -30.0f, 85.0f);
 	FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
 	this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
 	this->EquippedItem->SetActorTickEnabled(false);
 	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 	this->EquippedItem->ItemName = FString(TEXT("AR4"));
-	TArray<UObject*> Array2;
+	TArray<UObject *> Array2;
 	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons"), Array2, EngineUtils::ATL_Regular);
-	UTexture2D* texture = Cast<UTexture2D>(Array2[2]);
+	UTexture2D *texture = Cast<UTexture2D>(Array2[2]);
 	this->EquippedItem->ItemIcon = texture;
 	this->EquippedItemIndex = 0;
 	this->MyInventory->AddItem(this->EquippedItem);
-	SpawnFirstWeapon1();
+	OnRep_WeaponSwitch();
 }
 
-void AFPSCharacter::SpawnFirstWeapon1_Implementation() {
-	if (!EquippedItem) {
-		FString healthMessage = FString::Printf(TEXT("%s creates!"), *GetFName().ToString());
-		FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, 0, 85.0f);
-		FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
-		this->EquippedItem = GetWorld()->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
-	}
-	if (true) {
-		UWorld* World = GetWorld();
-		const TCHAR* SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
-		TArray<UObject*> Array;
+void AFPSCharacter::OnRep_WeaponSwitch()
+{
+	if (EquippedItem)
+	{
+		UWorld *World = GetWorld();
+		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+		TArray<UObject *> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
-		USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
+		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
 		this->EquippedItem->SetActorTickEnabled(false);
 		this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
 		this->EquippedItem->SkeletalMesh->AttachToComponent(FPSCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
@@ -185,7 +179,7 @@ void AFPSCharacter::MoveRight(float Value)
 
 void AFPSCharacter::UseItem_Implementation()
 {
-	if(!EquippedItem)
+	if (!EquippedItem)
 		SpawnFirstWeapon();
 	check(GEngine != nullptr);
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Using Item"));
@@ -229,7 +223,12 @@ void AFPSCharacter::ThrowItem()
 
 void AFPSCharacter::ChooseItem(int Index)
 {
-	if (Index == this->EquippedItemIndex)		// not to change the same item
+	EquipItem(Index);
+}
+
+void AFPSCharacter::EquipItem_Implementation(int Index)
+{
+	if (Index == this->EquippedItemIndex) // not to change the same item
 		return;
 	if (EquippedItem)
 	{
@@ -241,13 +240,11 @@ void AFPSCharacter::ChooseItem(int Index)
 	if (EquippedItem)
 	{
 		this->EquippedItemIndex = Index;
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		this->ManagerCamera->GetCameraViewPoint(CameraLocation, CameraRotation);
-		FVector OffSet;
-		OffSet.Set(120.0f, 30.0f, -30.0f);
-		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
+		FVector CameraLocation = this->FPSCameraComponent->GetComponentLocation();
+		FRotator CameraRotation = this->FPSCameraComponent->GetComponentRotation();
+		FVector OffSet(120.0f, 30.0f, -30.0f);
 		FRotator OffSet2(0.0f, -90.0f, 0.0f);
+		FVector Location = FTransform(CameraRotation, CameraLocation).TransformPosition(OffSet);
 		FQuat Rotation = FTransform(CameraRotation).TransformRotation(OffSet2.Quaternion());
 		this->EquippedItem->SetActorLocation(Location);
 		this->EquippedItem->SetActorRotation(Rotation);
@@ -258,8 +255,9 @@ void AFPSCharacter::ChooseItem(int Index)
 
 void AFPSCharacter::Reload_Implementation()
 {
-	if (EquippedItem) {
-		AWeapon* weapon = Cast<AWeapon>(this->EquippedItem);
+	if (EquippedItem)
+	{
+		AWeapon *weapon = Cast<AWeapon>(this->EquippedItem);
 		if (weapon)
 			weapon->StartReloading();
 	}
@@ -267,17 +265,17 @@ void AFPSCharacter::Reload_Implementation()
 
 void AFPSCharacter::DamageMe(int damage)
 {
-	
 }
 
-float AFPSCharacter::GetHealth() {
+float AFPSCharacter::GetHealth()
+{
 	return this->CurrentHealth;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Replicated Properties
 
-void AFPSCharacter::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLifetimeProps) const
+void AFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -308,7 +306,7 @@ void AFPSCharacter::OnHealthUpdate()
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
 	}
 
-	//Functions that occur on all machines. 
+	//Functions that occur on all machines.
 	/*
 		Any special functionality that should occur as a result of damage or death should be placed here.
 	*/
@@ -328,13 +326,14 @@ void AFPSCharacter::SetCurrentHealth(float healthValue)
 	}
 }
 
-float AFPSCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AFPSCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float damageApplied = CurrentHealth - DamageTaken;
 	SetCurrentHealth(damageApplied);
 	return damageApplied;
 }
 
-AItem* AFPSCharacter::GetEquippedItem() {
+AItem *AFPSCharacter::GetEquippedItem()
+{
 	return this->EquippedItem;
 }
