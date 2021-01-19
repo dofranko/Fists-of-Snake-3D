@@ -23,7 +23,7 @@ AFPSProjectile::AFPSProjectile()
 		ExplosionEffect = DefaultExplosionEffect.Object;
 	}
 
-	ProjectileMovementComponent->InitialSpeed = 3000.0f;
+	ProjectileMovementComponent->InitialSpeed = 7000.0f;
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Bounciness = 0.3f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
