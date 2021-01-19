@@ -9,7 +9,7 @@ AWeapon::AWeapon()
 
 	this->SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletalMesh"));
 	this->RootComponent = this->SkeletalMesh;
-
+	PrimaryActorTick.bCanEverTick = true;
 	if (!ProjectileClass) {
 		ProjectileClass = AFPSProjectile::StaticClass();
 	}
@@ -28,19 +28,20 @@ AWeapon::AWeapon()
 	bReloading = false;
 	bReplicates = true;
 	SetReplicateMovement( true);
+	AmmoState = 0;
 }
 
 
 void AWeapon::Use_Implementation(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {
 	check(GEngine != nullptr);
 	if (bReloading) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Reloading"));
+		
 	}
 	else if (CurrentAmmunitionMagazine <= 0 && CurrentAmmunitionTotal <= 0) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("No ammo"));
+		AmmoState = 2;
 	}
 	else if (CurrentAmmunitionMagazine <= 0) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Need to reload"));
+		AmmoState = 3;
 	}
 	else {
 		this->Fire(MuzzleLocation, MuzzleRotation);
@@ -55,7 +56,6 @@ void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator&
 			// Spawn the projectile at the muzzle.
 			FActorSpawnParameters spawnParameters;
 			
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("Shooting. I 1 Have %d ammo"), CurrentAmmunitionMagazine));
 			spawnParameters.Owner = this;
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (Projectile)
@@ -86,6 +86,7 @@ void AWeapon::StartReloading() {
 	
 	if (!bReloading) {
 		bReloading = true;
+		AmmoState = 1;
 		GetWorld()->GetTimerManager().SetTimer(_reloadTimerHandler, this, &AWeapon::StopReloading, ReloadTime, false);
 	}
 	
@@ -93,8 +94,12 @@ void AWeapon::StartReloading() {
 
 void AWeapon::StopReloading() {
 	bReloading = false;
+	AmmoState = 0;
 	Reload();
 }
+
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Replicated Properties
@@ -106,6 +111,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray <FLifetimeProperty>& OutLifetime
 	//Replicate current health.
 	DOREPLIFETIME(AWeapon, CurrentAmmunitionMagazine); 
 	DOREPLIFETIME(AWeapon, CurrentAmmunitionTotal);
+	DOREPLIFETIME(AWeapon, AmmoState);
 }
 
 void AWeapon::SetCurrentAmmunitionMagazine(int ammo) {

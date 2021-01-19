@@ -28,26 +28,6 @@ void AFPSHUD::DrawHUD()
         AFPSCharacter *mainFpsPlayer = Cast<AFPSCharacter>(mainPlayer);
         if (mainFpsPlayer)
         {
-            AWeapon *playerWeapon = Cast<AWeapon>(mainFpsPlayer->EquippedItem);
-            if (playerWeapon)
-            {
-                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionTotal()), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-                DrawText(FString::FromInt(playerWeapon->GetCurrentAmmunitionMagazine()), FontColor, PositionAmmunitionMagazine.X, PositionAmmunitionMagazine.Y, GEngine->GetSmallFont(), FontSizeAmmunitionMagazine, bScalePosition);
-            }
-
-            float playerHealth = mainFpsPlayer->GetCurrentHealth();
-            if (playerHealth)
-            {
-                DrawText(FString::SanitizeFloat(playerHealth), FontColor, PositionHealth.X, PositionHealth.Y, GEngine->GetSmallFont(), FontSizeHealth, bScalePosition);
-            }
-
-            AGrenade *PlayerGrenade = Cast<AGrenade>(mainFpsPlayer->EquippedItem);
-            if (PlayerGrenade)
-            {
-                int NumberOfGrenades = PlayerGrenade->NumberOfGrenades;
-                DrawText(FString::FromInt(NumberOfGrenades), FontColor, PositionAmmunitionTotal.X, PositionAmmunitionTotal.Y, GEngine->GetSmallFont(), FontSizeAmmunitionTotal, bScalePosition);
-            }
-
             // Draw slots of the inventory
             for (int i = 0; i < 5; i++)
             {

@@ -38,6 +38,9 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentAmmunitionMagazine();
 
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentAmmunitionMagazine)
+	int AmmoState;
+
 public:
 
 	AWeapon();
@@ -69,6 +72,10 @@ public:
 	UFUNCTION(Category = "Ammo")
 	void SetCurrentAmmunitionTotal(int ammo);
 
+	/** Getter for ammo state in magazine.*/
+	UFUNCTION(BlueprintCallable, Category = "Ammo")
+	FORCEINLINE	int GetAmmoState() const { return AmmoState; }
+
 	// Projectile class to spawn.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AFPSProjectile> ProjectileClass;
@@ -90,6 +97,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Reload();
+
 
 private:
 	FTimerHandle _reloadTimerHandler;

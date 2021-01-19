@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Ammo.h"
 #include "Weapon.h"
 
@@ -12,14 +11,13 @@ AAmmo::AAmmo()
 	this->Ammunition = 50;
 }
 
-void AAmmo::PickUp(AFPSCharacter* Player)
+void AAmmo::PickUp(AFPSCharacter *Player)
 {
-	AWeapon* PlayerWeapon = Cast<AWeapon>(Player->EquippedItem);
+	AWeapon *PlayerWeapon = Cast<AWeapon>(Player->EquippedItem);
 	if (PlayerWeapon)
 	{
 		if (PlayerWeapon->GetCurrentAmmunitionMagazine() == PlayerWeapon->GetMaxAmmunitionMagazine() && PlayerWeapon->GetMaxAmmunitionTotal() == PlayerWeapon->GetCurrentAmmunitionTotal())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Your weapon is full of ammo"));
 			return;
 		}
 
@@ -45,6 +43,4 @@ void AAmmo::PickUp(AFPSCharacter* Player)
 
 		Destroy();
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("You have to hold some weapon"));
 }

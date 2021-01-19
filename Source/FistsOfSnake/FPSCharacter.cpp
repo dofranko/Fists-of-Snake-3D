@@ -58,9 +58,6 @@ void AFPSCharacter::BeginPlay()
 	Super::BeginPlay();
 	check(GEngine != nullptr);
 
-	// Display a debug message for five seconds.
-	// The -1 "Key" value argument prevents the message from being updated or refreshed.
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter."));
 
 	// Create an elementery weapon for player
 	UWorld *World = GetWorld();
@@ -79,6 +76,13 @@ void AFPSCharacter::BeginPlay()
 	}
 
 	bAlive = true;
+	
+	if (IsLocallyControlled())
+	{
+		// Display a debug message for five seconds.
+		// The -1 "Key" value argument prevents the message from being updated or refreshed.
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Nowy gracz dołącza do serwera"));
+	}
 }
 
 void AFPSCharacter::SpawnFirstWeapon_Implementation()
@@ -182,14 +186,14 @@ void AFPSCharacter::UseItem_Implementation()
 	if (!EquippedItem)
 		SpawnFirstWeapon();
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Using Item"));
 	// Attempt to fire a projectile.
 
 	FVector muzzleLocation = this->FPSCameraComponent->GetComponentLocation();
 	FRotator muzzleRotation = this->FPSCameraComponent->GetComponentRotation();
+	FVector OffSet(120.0f, 0,0);
+	muzzleLocation = FTransform(muzzleRotation, muzzleLocation).TransformPosition(OffSet);
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.Owner = this;
-
 	this->EquippedItem->Use(muzzleLocation, muzzleRotation);
 	if (!this->EquippedItem->bAlive)
 	{
@@ -289,13 +293,10 @@ void AFPSCharacter::OnHealthUpdate()
 	//Client-specific functionality
 	if (IsLocallyControlled())
 	{
-		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
 
 		if (CurrentHealth <= 0)
 		{
-			FString deathMessage = FString::Printf(TEXT("You have been killed."));
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, deathMessage);
+			//TODO umieranie
 		}
 	}
 
