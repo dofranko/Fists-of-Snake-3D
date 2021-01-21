@@ -26,11 +26,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 	float MaxHealth;
 
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 	float CurrentHealth;
 
 	UFUNCTION()
@@ -40,9 +40,8 @@ protected:
 	void OnHealthUpdate();
 
 public:
-
 	/** Property replication */
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 
 	/** Getter for Max Health.*/
 	UFUNCTION(BlueprintPure, Category = "Health")
@@ -58,7 +57,7 @@ public:
 
 	/** Event for taking damage. Overridden from APawn.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float TakeDamage(float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float DamageTaken, struct FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser) override;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -83,11 +82,11 @@ public:
 	FVector MuzzleOffset;
 
 	// Actualy used item in hands
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentHealth, EditDefaultsOnly, Category = Item)
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSwitch, EditDefaultsOnly, Category = Item)
 	AItem *EquippedItem;
 
-	UFUNCTION(BlueprintPure, Category=Weapon)
-	AItem* GetEquippedItem();
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	AItem *GetEquippedItem();
 
 	int EquippedItemIndex = -1;
 
@@ -102,8 +101,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SpawnFirstWeapon();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void SpawnFirstWeapon1();
+	UFUNCTION()
+	void OnRep_WeaponSwitch();
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -113,15 +112,13 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *FPSMesh;
 
-
-
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent *WeaponMesh;
-	
+
 	UFUNCTION()
 	float GetHealth();
-	
+
 	UPROPERTY(VisibleAnywhere)
 	bool bAlive;
 
@@ -135,12 +132,15 @@ public:
 
 	void ThrowItem();
 
+	
 	void ChooseItem(int index);
+
+	UFUNCTION(Server, Reliable)
+	void EquipItem(int index);
 
 	void DamageMe(int damage);
 
 	Inventory *MyInventory;
-	
-	const APlayerCameraManager *ManagerCamera;
 
+	const APlayerCameraManager *ManagerCamera;
 };
