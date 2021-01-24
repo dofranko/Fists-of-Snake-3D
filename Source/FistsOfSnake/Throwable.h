@@ -67,4 +67,5 @@ public:
 	void FireInDirection(const FVector& ShootDirection);
 
 	virtual void Destroyed() override;
+
 };
