@@ -56,7 +56,7 @@ void AWeapon::Fire_Implementation(const FVector& MuzzleLocation, const FRotator&
 			// Spawn the projectile at the muzzle.
 			FActorSpawnParameters spawnParameters;
 			
-			spawnParameters.Owner = this;
+			spawnParameters.Owner = GetOwner();
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, spawnParameters);
 			if (Projectile)
 			{

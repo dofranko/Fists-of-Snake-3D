@@ -7,6 +7,8 @@
 #include "Inventory.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
+#include <FistsOfSnake/FoSPlayerState.h>
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -98,6 +100,7 @@ void AFPSCharacter::SpawnFirstWeapon_Implementation()
 	this->EquippedItem->SetActorTickEnabled(false);
 	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 	this->EquippedItem->ItemName = FString(TEXT("AR4"));
+	this->EquippedItem->SetOwner(this);
 	TArray<UObject *> Array2;
 	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons"), Array2, EngineUtils::ATL_Regular);
 	UTexture2D *texture = Cast<UTexture2D>(Array2[2]);
@@ -232,6 +235,9 @@ void AFPSCharacter::ChooseItem(int Index)
 
 void AFPSCharacter::EquipItem_Implementation(int Index)
 {
+	if (false) {
+		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString());
+	}
 	if (Index == this->EquippedItemIndex) // not to change the same item
 		return;
 	if (EquippedItem)
@@ -288,23 +294,35 @@ void AFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLif
 	DOREPLIFETIME(AFPSCharacter, EquippedItem);
 }
 
-void AFPSCharacter::OnHealthUpdate()
+void AFPSCharacter::OnHealthUpdate(AActor *DamageCauser)
 {
 	//Client-specific functionality
 	if (IsLocallyControlled())
 	{
 
-		if (CurrentHealth <= 0)
-		{
-			//TODO umieranie
-		}
+		
 	}
 
 	//Server-specific functionality
-	if (GetLocalRole() == ROLE_Authority)
+	if (GetLocalRole() == ROLE_Authority && IsLocallyControlled())
 	{
-		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
+		//FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, healthMessage);
+
+	}
+	if (HasAuthority()) {
+		if (CurrentHealth <= 0)
+		{
+			if (AFoSPlayerState *playerState = GetPlayerState<AFoSPlayerState>()) {
+				playerState->deaths += 1;
+			}
+			if (AFPSCharacter* damager = Cast<AFPSCharacter>(DamageCauser->GetOwner())) {
+				if (AFoSPlayerState* playerState = damager->GetPlayerState<AFoSPlayerState>()) {
+					playerState->kills += 1;
+				}
+			}
+		}
+		
 	}
 
 	//Functions that occur on all machines.
@@ -315,22 +333,22 @@ void AFPSCharacter::OnHealthUpdate()
 
 void AFPSCharacter::OnRep_CurrentHealth()
 {
-	OnHealthUpdate();
+	OnHealthUpdate(NULL);
 }
 
-void AFPSCharacter::SetCurrentHealth(float healthValue)
+void AFPSCharacter::SetCurrentHealth(float healthValue, AActor *DamageCauser)
 {
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
-		OnHealthUpdate();
+		OnHealthUpdate(DamageCauser);
 	}
 }
 
 float AFPSCharacter::TakeDamage(float DamageTaken, struct FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float damageApplied = CurrentHealth - DamageTaken;
-	SetCurrentHealth(damageApplied);
+	SetCurrentHealth(damageApplied, DamageCauser);
 	return damageApplied;
 }
 

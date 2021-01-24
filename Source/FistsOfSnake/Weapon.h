@@ -41,9 +41,11 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentAmmunitionMagazine)
 	int AmmoState;
 
+
 public:
 
 	AWeapon();
+
 
 	/** Property replication */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
