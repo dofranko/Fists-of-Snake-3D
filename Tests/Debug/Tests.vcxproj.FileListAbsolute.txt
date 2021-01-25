@@ -1,0 +1,2 @@
+C:\Users\Adam\Documents\GitHub\Fists-of-Snake-3D\Tests\Debug\Tests.vcxprojAssemblyReference.cache
+C:\Users\Adam\Documents\GitHub\Fists-of-Snake-3D\Tests\Debug\Tests.vcxproj.CopyComplete

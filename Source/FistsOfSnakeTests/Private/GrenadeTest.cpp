@@ -44,15 +44,12 @@ bool FGrenadeTest::RunTest(const FString& Parameters)
 {
     {
 
-        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/FPSMapTest")));
-
         ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(true));
 
         ADD_LATENT_AUTOMATION_COMMAND(FGrenadeCommand(this));
 
         ADD_LATENT_AUTOMATION_COMMAND(FEndPlayMapCommand);
 
-        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/MainMenuMAp")));
     }
 
     return true;

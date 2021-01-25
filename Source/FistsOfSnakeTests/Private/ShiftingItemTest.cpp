@@ -33,20 +33,27 @@ bool FShiftingItemCommand::Update()
 	Weapon->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
 	Weapon2->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
 	Grenade->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
-	Player->MyInventory->AddItem(Weapon);
-	Player->MyInventory->AddItem(Grenade);
-	Player->MyInventory->AddItem(Weapon2);
+	Weapon->PickUp(Player);
+	Grenade->PickUp(Player);
+	Weapon2->PickUp(Player);
 
+	if (!Weapon->IsHidden() || !Weapon2->IsHidden() || !Grenade->IsHidden())
+		test->AddError(TEXT("Some item after picking up is still visible in game"));
+	FVector location = Weapon->GetActorLocation();
 	Player->ChooseItem(0);
 	if (!Player->EquippedItem)
 		test->AddError(TEXT("The position 0 is null"));
+	FVector location2 = Weapon->GetActorLocation();
 	Player->ThrowItem();
+	FVector location3 = Weapon->GetActorLocation();
+	if (location == location2 || location2 == location3)
+		test->AddError(TEXT("The item should change locations"));
+
 	if (Player->EquippedItem)
 		test->AddError(TEXT("Player shouldn't have item after throwing it out"));
 	if (Player->MyInventory->GetItem(0))
 		test->AddError(TEXT("A throwed item shouldn't be in player's inventory"));
-	if (Player->ManagerCamera)
-		Player->ChooseItem(1);
+	Player->ChooseItem(1);
 	if (!Player->EquippedItem)
 		test->AddError(TEXT("The position 1 is null"));
 	Player->ChooseItem(2);
@@ -58,7 +65,6 @@ bool FShiftingItemCommand::Update()
 	Player->ChooseItem(4);
 	if (Player->EquippedItem)
 		test->AddError(TEXT("The position 4 isn't null"));
-
     return true;
 }
 
@@ -67,7 +73,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FShiftingItemTest, "ShiftingItemTest", EAutomat
 bool FShiftingItemTest::RunTest(const FString& Parameters)
 {
     {
-        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/FPSMapTest")));
+		//ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/de_snake2")));
 
         ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(true));
 
@@ -75,7 +81,7 @@ bool FShiftingItemTest::RunTest(const FString& Parameters)
 
         ADD_LATENT_AUTOMATION_COMMAND(FEndPlayMapCommand);
 
-        ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/MainMenuMAp")));
+        //ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TEXT("/Game/Maps/MainMenuMAp")));
     }
 
     return true;
