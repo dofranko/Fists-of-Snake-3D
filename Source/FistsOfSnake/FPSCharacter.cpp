@@ -5,6 +5,7 @@
 #include "Weapon.h"
 #include "Item.h"
 #include "Inventory.h"
+#include "Grenade.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -97,6 +98,7 @@ void AFPSCharacter::SpawnFirstWeapon_Implementation()
 	FVector SpawnLocation = this->FPSCameraComponent->GetComponentLocation() + FVector(-120.0f, -30.0f, 85.0f);
 	FRotator Rotation = this->FPSCameraComponent->GetComponentRotation() + FRotator(0.0f, -90.0f, 0.0f);
 	this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
+	this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh);
 	this->EquippedItem->SetActorTickEnabled(false);
 	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
 	this->EquippedItem->ItemName = FString(TEXT("AR4"));
@@ -107,6 +109,47 @@ void AFPSCharacter::SpawnFirstWeapon_Implementation()
 	this->EquippedItem->ItemIcon = texture;
 	this->EquippedItemIndex = 0;
 	this->MyInventory->AddItem(this->EquippedItem);
+	///
+
+	const TCHAR* SkeletalPath2 = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/Ka47");
+	TArray<UObject*> Array3;
+	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath2, Array3, EngineUtils::ATL_Regular);
+	USkeletalMesh* SkeletalMesh2 = Cast<USkeletalMesh>(Array3[0]);
+	this->EquippedItem = World->SpawnActor<AWeapon>(AWeapon::StaticClass(), SpawnLocation, Rotation);
+	this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh2);
+	this->EquippedItem->SetActorTickEnabled(false);
+	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
+	this->EquippedItem->ItemName = FString(TEXT("Ka47"));
+	this->EquippedItem->SetOwner(this);
+	TArray<UObject*> Array4;
+	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons"), Array4, EngineUtils::ATL_Regular);
+	texture = Cast<UTexture2D>(Array2[1]);
+	this->EquippedItem->ItemIcon = texture;
+	this->EquippedItemIndex = 1;
+	this->MyInventory->AddItem(this->EquippedItem);
+
+	//
+
+	const TCHAR* SkeletalPath3 = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/G67_Grenade");
+	TArray<UObject*> Array5;
+	EngineUtils::FindOrLoadAssetsByPath(SkeletalPath3, Array5, EngineUtils::ATL_Regular);
+	USkeletalMesh* SkeletalMesh3 = Cast<USkeletalMesh>(Array5[0]);
+	this->EquippedItem = World->SpawnActor<AGrenade>(AGrenade::StaticClass(), SpawnLocation, Rotation);
+	this->EquippedItem->SkeletalMesh->SetSkeletalMesh(SkeletalMesh3);
+	this->EquippedItem->SetActorTickEnabled(false);
+	this->EquippedItem->Players.Add(this); // in the future -> ArrayOfPlayers
+	this->EquippedItem->ItemName = FString(TEXT("G67"));
+	this->EquippedItem->SetOwner(this);
+	TArray<UObject*> Array6;
+	EngineUtils::FindOrLoadAssetsByPath(TEXT("/Game/FPS_Weapon_Bundle/Icons"), Array6, EngineUtils::ATL_Regular);
+	texture = Cast<UTexture2D>(Array6[0]);
+	this->EquippedItem->ItemIcon = texture;
+	this->EquippedItemIndex = 0;
+	this->MyInventory->AddItem(this->EquippedItem);
+
+
+	ChooseItem(4);
+	ChooseItem(0);
 	OnRep_WeaponSwitch();
 }
 
@@ -116,6 +159,12 @@ void AFPSCharacter::OnRep_WeaponSwitch()
 	{
 		UWorld *World = GetWorld();
 		const TCHAR *SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/AR4");
+		if (EquippedItem->ItemName.Equals(FString(TEXT("Ka47")))) {
+			SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/Ka47");
+		}
+		else if (EquippedItem->ItemName.Equals(FString(TEXT("G67")))) {
+			SkeletalPath = TEXT("/Game/FPS_Weapon_Bundle/Weapons/Meshes/G67_Grenade");
+		}
 		TArray<UObject *> Array;
 		EngineUtils::FindOrLoadAssetsByPath(SkeletalPath, Array, EngineUtils::ATL_Regular);
 		USkeletalMesh *SkeletalMesh = Cast<USkeletalMesh>(Array[0]);
@@ -186,11 +235,12 @@ void AFPSCharacter::MoveRight(float Value)
 
 void AFPSCharacter::UseItem_Implementation()
 {
-	if (!EquippedItem)
+	if (this->MyInventory->GetItem(0)==nullptr)
 		SpawnFirstWeapon();
 	check(GEngine != nullptr);
 	// Attempt to fire a projectile.
-
+	if (EquippedItem == nullptr)
+		return;
 	FVector muzzleLocation = this->FPSCameraComponent->GetComponentLocation();
 	FRotator muzzleRotation = this->FPSCameraComponent->GetComponentRotation();
 	FVector OffSet(120.0f, 0,0);
@@ -321,6 +371,10 @@ void AFPSCharacter::OnHealthUpdate(AActor *DamageCauser)
 					playerState->kills += 1;
 				}
 			}
+			this->TeleportTo(FVector(3480.0f, -9620.0f, 140.0f), FRotator(0.0f, -90.0f, 0.0f), false, false);
+			MyInventory->DestroyItems();
+			SpawnFirstWeapon();
+			CurrentHealth = 100;
 		}
 		
 	}

@@ -20,6 +20,8 @@ AFPSProjectileGrenade::AFPSProjectileGrenade()
 	ProjectileMovementComponent->InitialSpeed = 1500.0f;
 	ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
 
+	this->Damage = 49.0f;
+
 	static ConstructorHelpers::FObjectFinder<USoundCue> Sound(TEXT("'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
 	ExplosionSound = Sound.Object;
 
