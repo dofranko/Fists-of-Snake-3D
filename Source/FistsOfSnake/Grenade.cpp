@@ -11,12 +11,13 @@ AGrenade::AGrenade()
 	ProjectileGrenadeClass = AFPSProjectileGrenade::StaticClass();
 
 	this->NumberOfGrenades = 10;
+
 }
 
 void AGrenade::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation)
 {
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Throwing a grenade"));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Throwing a grenade"));
 	this->ThrowGrenade(MuzzleLocation, MuzzleRotation);
 	this->NumberOfGrenades -= 1;
 	if (this->NumberOfGrenades == 0)

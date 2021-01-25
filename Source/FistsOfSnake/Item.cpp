@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Item.h"
+#include "Net/UnrealNetwork.h"
 #include <Runtime\Engine\Classes\Kismet\KismetSystemLibrary.h>
 #include <Runtime\Engine\Public\DrawDebugHelpers.h>
 
@@ -93,3 +94,11 @@ void AItem::ThrowMe(AFPSCharacter* Player)
 void AItem::Use(const FVector& MuzzleLocation, const FRotator& MuzzleRotation) {}
 
 void AItem::Reload() {}
+
+void AItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//Replicate current health.
+	DOREPLIFETIME(AItem, ItemName);
+}

@@ -49,6 +49,7 @@ void Inventory::DestroyItems()
 		if (this->ArrayOfItems[Index])
 		{
 			this->ArrayOfItems[Index]->Destroy();
+			this->ArrayOfItems[Index] = nullptr;
 		}
 	}
 }

@@ -37,7 +37,7 @@ protected:
 	void OnRep_CurrentHealth();
 
 	/** Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify*/
-	void OnHealthUpdate();
+	void OnHealthUpdate(AActor *DamageCauser);
 
 public:
 	/** Property replication */
@@ -53,7 +53,7 @@ public:
 
 	/** Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetCurrentHealth(float healthValue);
+	void SetCurrentHealth(float healthValue, AActor *DamageCauser);
 
 	/** Event for taking damage. Overridden from APawn.*/
 	UFUNCTION(BlueprintCallable, Category = "Health")
